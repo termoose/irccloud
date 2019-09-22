@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/termoose/irccloud/events"
 	"github.com/termoose/irccloud/requests"
 )
