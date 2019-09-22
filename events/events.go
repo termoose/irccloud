@@ -48,14 +48,13 @@ func (e *eventHandler) Enqueue(msg []byte) {
 	current := event{}
 	json.Unmarshal(msg, &current)
 
+	// Attach raw message data
 	current.Data = msg
 
 	e.Queue <- current
 }
 
 func (e *eventHandler) handle(curr_event event) {
-	//log.Printf("Event %s: %s", curr_event.Type, curr_event.Data)
-
 	switch curr_event.Type {
 	case "oob_include":
 		oob_data := &oob_include{}
