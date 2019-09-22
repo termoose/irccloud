@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/termoose/irccloud/events"
 	"github.com/termoose/irccloud/requests"
+	"github.com/rivo/tview"
 )
 
 func main() {
@@ -10,6 +11,11 @@ func main() {
 
 	ws_conn := requests.NewConnection(session)
 	event_handler := events.NewHandler(session)
+
+	box := tview.NewBox().SetBorder(true).SetTitle("Hello, world!")
+	if err := tview.NewApplication().SetRoot(box, true).Run(); err != nil {
+		panic(err)
+	}
 
 	for {
 		msg, err := ws_conn.ReadMessage()
