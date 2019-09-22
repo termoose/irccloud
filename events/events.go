@@ -61,7 +61,7 @@ func (e *eventHandler) handle(curr_event event) {
 		json.Unmarshal(curr_event.Data, &oob_data)
 		backlog := requests.GetBacklog(e.SessionToken, oob_data.Url)
 
-		log.Println("BACKLOG: %s\n", backlog)
+		//log.Println("BACKLOG: %s\n", backlog)
 		// FIXME: parse the `channel_init` messages from backlog
 		// and use them to initialize the joined channels list
 	case "buffer_msg":
