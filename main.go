@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"irccloud/requests"
+	"github.com/termoose/irccloud/events"
+	"github.com/termoose/irccloud/requests"
 
 	"net/http"
 	"net/url"
@@ -28,13 +29,15 @@ func main() {
 	}
 	defer conn.Close()
 
+	event_handler := events.NewHandler(session)
+
 	for {
 		_, msg, err := conn.ReadMessage()
 
 		if err != nil {
-			fmt.Printf("Nothing...\n")
+			panic("Connection lost")
 		}
 
-		fmt.Printf("Received: %s\n", msg)
+		event_handler.Enqueue(msg)
 	}
 }

@@ -2,6 +2,9 @@ package requests
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -21,6 +24,26 @@ type formtoken_reply struct {
 	Id      uint32
 	Success bool
 	Token   string
+}
+
+func GetBacklog(token, endpoint string) string {
+	path := fmt.Sprintf("https://api.irccloud.com%s", endpoint)
+	client := http.Client{}
+
+	req, _ := http.NewRequest("GET", path, nil)
+	req.Header.Add("User-Agent", "irccloud-cli")
+	req.Header.Add("Origin", "https://api.irccloud.com")
+	req.Header.Add("Cookie", fmt.Sprintf("session=%s", token))
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		log.Printf("Error fetching %s\n", path)
+	}
+
+	response, _ := ioutil.ReadAll(resp.Body)
+
+	return string(response)
 }
 
 func GetSessionToken(user, pass string) string {
