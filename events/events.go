@@ -3,7 +3,8 @@ package events
 import (
 	"encoding/json"
 	"github.com/termoose/irccloud/requests"
-	"log"
+	"github.com/termoose/irccloud/ui"
+	//"log"
 )
 
 type event struct {
@@ -26,12 +27,14 @@ type buffer_msg struct {
 type eventHandler struct {
 	Queue chan event
 	SessionToken string
+	Window *ui.Window
 }
 
-func NewHandler(token string) (*eventHandler) {
+func NewHandler(token string, w *ui.Window) (*eventHandler) {
 	handler := &eventHandler{
 		Queue: make(chan event, 8),
 		SessionToken: token,
+		Window: w,
 	}
 
 	// Start consumer thread
@@ -59,7 +62,7 @@ func (e *eventHandler) handle(curr_event event) {
 	case "oob_include":
 		oob_data := &oob_include{}
 		json.Unmarshal(curr_event.Data, &oob_data)
-		backlog := requests.GetBacklog(e.SessionToken, oob_data.Url)
+		requests.GetBacklog(e.SessionToken, oob_data.Url)
 
 		//log.Println("BACKLOG: %s\n", backlog)
 		// FIXME: parse the `channel_init` messages from backlog
@@ -67,6 +70,7 @@ func (e *eventHandler) handle(curr_event event) {
 	case "buffer_msg":
 		msg_data := &buffer_msg{}
 		json.Unmarshal(curr_event.Data, &msg_data)
-		log.Printf("<%s> %s", msg_data.From, msg_data.Msg)
+		//log.Printf("<%s> %s", msg_data.From, msg_data.Msg)
+		e.Window.AddLine(msg_data.From, msg_data.Msg)
 	}
 }
