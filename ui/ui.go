@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 )
 
@@ -18,6 +19,7 @@ type Window struct {
 type channel struct {
 	layout *tview.Grid
 
+	name string
 	chat *tview.TextView
 	users *tview.TextView
 	input *tview.TextView
@@ -27,6 +29,7 @@ type channel struct {
 type View struct {
 	Pages *tview.Pages
 	App *tview.Application
+	ActiveChannel int
 	Channels []channel
 }
 
@@ -41,6 +44,24 @@ func NewView() (*View) {
 func (v *View) Start() {
 	v.App = tview.NewApplication()
 
+	v.App.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		total_active := v.Pages.GetPageCount()
+
+		if event.Key() == tcell.KeyLeft {
+			v.ActiveChannel = (v.ActiveChannel - 1 + total_active) % total_active
+			page := v.Channels[v.ActiveChannel]
+			v.Pages.SwitchToPage(page.name)
+		}
+
+		if event.Key() == tcell.KeyRight {
+			v.ActiveChannel = (v.ActiveChannel + 1) % total_active
+			page := v.Channels[v.ActiveChannel]
+			v.Pages.SwitchToPage(page.name)
+		}
+
+		return event
+	})
+
 	if err := v.App.SetRoot(v.Pages, true).SetFocus(v.Pages).Run(); err != nil {
 		panic(err)
 	}
@@ -49,6 +70,7 @@ func (v *View) Start() {
 func (v *View) AddChannel(name string) {
 	new_chan := channel{
 		layout: tview.NewGrid().SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
+		name: name,
 		chat: newTextView("text here"),
 		users: newTextView("users here"),
 		input: newTextView("input text here"),
@@ -62,6 +84,9 @@ func (v *View) AddChannel(name string) {
 	new_chan.layout.AddItem(new_chan.info,  0, 0, 1, 2, 0, 0, false)
 
 	v.Pages.AddPage(name, new_chan.layout, true, true)
+
+	// FIXME: Might not be the best idea to keep this counter
+	v.ActiveChannel = v.Pages.GetPageCount()
 
 	lol := append(v.Channels, new_chan)
 	v.Channels = lol
