@@ -21,7 +21,7 @@ type channel struct {
 
 	name string
 	chat *tview.TextView
-	users *tview.TextView
+	users *tview.List
 	input *tview.TextView
 	info *tview.TextView
 }
@@ -67,14 +67,18 @@ func (v *View) Start() {
 	}
 }
 
-func (v *View) AddChannel(name string) {
+func (v *View) AddChannel(name string, user_list []string) {
 	new_chan := channel{
 		layout: tview.NewGrid().SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
 		name: name,
 		chat: newTextView("text here"),
-		users: newTextView("users here"),
+		users: newListView(),
 		input: newTextView("input text here"),
 		info: newTextView(name),
+	}
+
+	for id, user := range user_list {
+		new_chan.users.AddItem(user, user, rune(id), nil)
 	}
 
 	// Layout
@@ -122,6 +126,10 @@ func (w *Window) Run() {
 	if err := w.App.SetRoot(w.Main, true).Run(); err != nil {
 	 	panic(err)
 	}
+}
+
+func newListView() *tview.List {
+	return tview.NewList().ShowSecondaryText(false)
 }
 
 func newTextView(text string) *tview.TextView {

@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
-	//"log"
+	_ "log"
 )
 
 type event struct {
-	Bid int32
-	Eid int32
-	Type string
+	Bid int32   `json:"bid"`
+	Eid int32   `json:"eid"`
+	Type string `json:"type"`
 	Data []byte
 }
 
@@ -27,10 +27,10 @@ type buffer_msg struct {
 type eventHandler struct {
 	Queue chan event
 	SessionToken string
-	Window *ui.Window
+	Window *ui.View
 }
 
-func NewHandler(token string, w *ui.Window) (*eventHandler) {
+func NewHandler(token string, w *ui.View) (*eventHandler) {
 	handler := &eventHandler{
 		Queue: make(chan event, 8),
 		SessionToken: token,
@@ -62,15 +62,30 @@ func (e *eventHandler) handle(curr_event event) {
 	case "oob_include":
 		oob_data := &oob_include{}
 		json.Unmarshal(curr_event.Data, &oob_data)
-		requests.GetBacklog(e.SessionToken, oob_data.Url)
+		backlog := requests.GetBacklog(e.SessionToken, oob_data.Url)
 
-		//log.Println("BACKLOG: %s\n", backlog)
+		//log.Printf("BACKLOG: %s\n", backlog)
+
+		backlogData := parseBacklog(backlog)
+
+		for _, event := range backlogData {
+			if event.Type == "channel_init" {
+				user_strings := []string{}
+				for _, user_string := range event.Members {
+					user_strings = append(user_strings, user_string.Nick)
+				}
+				
+				e.Window.AddChannel(event.Chan, user_strings)
+				//log.Printf("event: %v\n", event.Chan)
+			}
+		}
+		
 		// FIXME: parse the `channel_init` messages from backlog
 		// and use them to initialize the joined channels list
 	case "buffer_msg":
-		msg_data := &buffer_msg{}
-		json.Unmarshal(curr_event.Data, &msg_data)
+		//msg_data := &buffer_msg{}
+		//json.Unmarshal(curr_event.Data, &msg_data)
 		//log.Printf("<%s> %s", msg_data.From, msg_data.Msg)
-		e.Window.AddLine(msg_data.From, msg_data.Msg)
+		//e.Window.AddLine(msg_data.From, msg_data.Msg)
 	}
 }

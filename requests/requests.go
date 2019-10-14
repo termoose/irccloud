@@ -26,7 +26,7 @@ type formtoken_reply struct {
 	Token   string
 }
 
-func GetBacklog(token, endpoint string) string {
+func GetBacklog(token, endpoint string) []byte {
 	path := fmt.Sprintf("https://api.irccloud.com%s", endpoint)
 	client := http.Client{}
 
@@ -43,7 +43,7 @@ func GetBacklog(token, endpoint string) string {
 
 	response, _ := ioutil.ReadAll(resp.Body)
 
-	return string(response)
+	return response
 }
 
 func GetSessionToken(user, pass string) string {
