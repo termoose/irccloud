@@ -4,17 +4,8 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"sort"
 )
-
-type Window struct {
-	Main *tview.Grid
-
-	App *tview.Application
-	Chat *tview.TextView
-	users *tview.TextView
-	input *tview.TextView
-	info *tview.TextView
-}
 
 type channel struct {
 	layout *tview.Grid
@@ -95,36 +86,24 @@ func (v *View) AddChannel(name string, user_list []string) {
 	v.channels = append(v.channels, new_chan)
 }
 
-func NewWindow() (*Window) {
-	window := &Window{
-		Main: tview.NewGrid().
-			SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
-		Chat: newTextView(""),
-		users: newTextView("users"),
-		input: newTextView("input text here"),
-		info: newTextView("info at the top!"),
+func (v *View) getChannel(name string) *channel {
+	result := sort.Search(len(v.channels), func(i int) bool {
+		return v.channels[i].name == name
+	})
+
+	if result < len(v.channels) {
+		return &v.channels[result]
 	}
 
-	// Layout
-	window.Main.AddItem(window.users, 0, 2, 3, 1, 0, 0, false)
-	window.Main.AddItem(window.Chat,  1, 0, 1, 2, 0, 0, false)
-	window.Main.AddItem(window.input, 2, 0, 1, 2, 0, 0, false)
-	window.Main.AddItem(window.info,  0, 0, 1, 2, 0, 0, false)
-
-	return window
+	return nil
 }
 
-func (w *Window) AddLine(nick, msg string) {
-	line := fmt.Sprintf("<%s> %s\n", nick, msg)
-	w.Chat.Write([]byte(line))
-	w.App.Draw();
-}
+func (v *View) AddBufferMsg(channel, from, msg string) {
+	c := v.getChannel(channel)
 
-func (w *Window) Run() {
-	w.App = tview.NewApplication()
-
-	if err := w.App.SetRoot(w.Main, true).Run(); err != nil {
-	 	panic(err)
+	if c != nil {
+		line := fmt.Sprintf("<%s> %s\n", from, msg)
+		c.chat.Write([]byte(line))
 	}
 }
 

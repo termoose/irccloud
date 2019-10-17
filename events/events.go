@@ -68,6 +68,7 @@ func (e *eventHandler) handle(curr_event event) {
 
 		backlogData := parseBacklog(backlog)
 
+		// First we initialize all channels
 		for _, event := range backlogData {
 			if event.Type == "channel_init" {
 				user_strings := []string{}
@@ -79,6 +80,12 @@ func (e *eventHandler) handle(curr_event event) {
 				//log.Printf("event: %v\n", event.Chan)
 			}
 		}
+
+		for _, event := range backlogData {
+			if event.Type == "buffer_msg" {
+				e.Window.AddBufferMsg(event.Chan, event.From, event.Msg)
+			}
+		}
 		
 		// FIXME: parse the `channel_init` messages from backlog
 		// and use them to initialize the joined channels list
@@ -87,5 +94,6 @@ func (e *eventHandler) handle(curr_event event) {
 		//json.Unmarshal(curr_event.Data, &msg_data)
 		//log.Printf("<%s> %s", msg_data.From, msg_data.Msg)
 		//e.Window.AddLine(msg_data.From, msg_data.Msg)
+		//e.Window.AddBufferMsg(
 	}
 }

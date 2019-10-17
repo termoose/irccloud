@@ -7,6 +7,7 @@ import (
 
 // {"nick":"sytse","ident_prefix":"","user":"sytse","userhost":"swielinga.nl","usermask":"sytse@swielinga.nl","realname":"Sytse Wielinga","account":null,"ircserver":"leguin.freenode.net","mode":"","away":false,"avatar":null,"avatar_url":null}
 
+// {"bid":43026393,"eid":1570625780315817,"type":"buffer_msg","from":"BB-Martino","chan":"#lnd","cid":84415,"statusmsg":false,"msg":"err=non-ascii data < what's that about?","hostmask":"~martino@bitbargain.co.uk","ident_prefix":"~","from_name":"martino","from_host":"bitbargain.co.uk","from_account":"BB-Martino","from_realname":"Martin","avatar":null,"avatar_url":null}
 type member struct {
 	Nick     string `json:"nick"`
 	RealName string `json:"realname"`
@@ -24,6 +25,8 @@ type backlogData struct {
 	Type    string
 	Chan    string   `json:"chan"`
 	Members []member `json:"members"`
+	From    string   `json:"from"`
+	Msg     string   `json:"msg"`
 	//Events []event
 }
 
@@ -37,6 +40,9 @@ func parseBacklog(backlog []byte) []backlogData {
 
 	return backlog_data
 }
+
+// func initBacklog([]data backlogData) {
+// }
 
 func parseChannelInit(event []byte) channelInit {
 	chan_init := channelInit{}
