@@ -2,6 +2,7 @@ package events
 
 import (
 	"encoding/json"
+	_ "fmt"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
 	_ "log"
@@ -86,14 +87,10 @@ func (e *eventHandler) handle(curr_event event) {
 				e.Window.AddBufferMsg(event.Chan, event.From, event.Msg)
 			}
 		}
-		
-		// FIXME: parse the `channel_init` messages from backlog
-		// and use them to initialize the joined channels list
+
 	case "buffer_msg":
-		//msg_data := &buffer_msg{}
-		//json.Unmarshal(curr_event.Data, &msg_data)
-		//log.Printf("<%s> %s", msg_data.From, msg_data.Msg)
-		//e.Window.AddLine(msg_data.From, msg_data.Msg)
-		//e.Window.AddBufferMsg(
+		msg_data := &eventData{}
+		json.Unmarshal(curr_event.Data, &msg_data)
+		e.Window.AddBufferMsg(msg_data.Chan, msg_data.From, msg_data.Msg)
 	}
 }

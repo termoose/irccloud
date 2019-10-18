@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
-	"sort"
+	_ "sort"
 )
 
 type channel struct {
@@ -13,7 +13,7 @@ type channel struct {
 	name string
 	chat *tview.TextView
 	users *tview.List
-	input *tview.TextView
+	input *tview.InputField
 	info *tview.TextView
 }
 
@@ -62,14 +62,14 @@ func (v *View) AddChannel(name string, user_list []string) {
 	new_chan := channel{
 		layout: tview.NewGrid().SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
 		name: name,
-		chat: newTextView("text here"),
+		chat: newTextView(""),
 		users: newListView(),
-		input: newTextView("input text here"),
+		input: newTextInput(),
 		info: newTextView(name),
 	}
 
-	for id, user := range user_list {
-		new_chan.users.AddItem(user, user, rune(id), nil)
+	for _, user := range user_list {
+		new_chan.users.AddItem(user, user, 0, nil)
 	}
 
 	// Layout
@@ -88,12 +88,10 @@ func (v *View) AddChannel(name string, user_list []string) {
 }
 
 func (v *View) getChannel(name string) *channel {
-	result := sort.Search(len(v.channels), func(i int) bool {
-		return v.channels[i].name == name
-	})
-
-	if result < len(v.channels) {
-		return &v.channels[result]
+	for i, c := range v.channels {
+		if c.name == name {
+			return &v.channels[i]
+		}
 	}
 
 	return nil
@@ -105,7 +103,16 @@ func (v *View) AddBufferMsg(channel, from, msg string) {
 	if c != nil {
 		line := fmt.Sprintf("<%s> %s\n", from, msg)
 		c.chat.Write([]byte(line))
+		c.chat.ScrollToEnd()
 	}
+
+	v.app.Draw()
+}
+
+func newTextInput() *tview.InputField {
+	return tview.NewInputField().
+		SetFieldBackgroundColor(tcell.ColorBlack).
+			SetPlaceholder("type here...")
 }
 
 func newListView() *tview.List {

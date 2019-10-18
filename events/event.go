@@ -21,7 +21,7 @@ type channelInit struct {
 	Members []member `json:"members"`
 }
 
-type backlogData struct {
+type eventData struct {
 	Type    string
 	Chan    string   `json:"chan"`
 	Members []member `json:"members"`
@@ -30,12 +30,12 @@ type backlogData struct {
 	//Events []event
 }
 
-func parseBacklog(backlog []byte) []backlogData {
-	backlog_data := []backlogData{}
+func parseBacklog(backlog []byte) []eventData {
+	backlog_data := []eventData{}
 	err := json.Unmarshal(backlog, &backlog_data)
 
 	if err != nil {
-		return []backlogData{}
+		return []eventData{}
 	}
 
 	return backlog_data
