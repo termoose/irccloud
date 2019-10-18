@@ -1,45 +1,33 @@
 package main
 
 import (
-	"github.com/termoose/irccloud/events"
-	"github.com/termoose/irccloud/requests"
-	"github.com/termoose/irccloud/ui"
+	_ "github.com/termoose/irccloud/events"
+	_ "github.com/termoose/irccloud/requests"
+	_ "github.com/termoose/irccloud/ui"
+	"fmt"
+	"github.com/termoose/irccloud/config"
 )
 
 func main() {
-	session := requests.GetSessionToken("birkedal85@gmail.com", "SECRET")
-
-	view := ui.NewView()
-	//view.AddChannel("lol channel")
-	//view.AddChannel("another channel")
-	//view.Start()
-	ws_conn := requests.NewConnection(session)
-	//window := ui.NewWindow()
-	event_handler := events.NewHandler(session, view)
-
-	go func() {
-		for {
-			msg, err := ws_conn.ReadMessage()
-
-			if err != nil {
-				panic("Connection lost!")
-			}
-
-			event_handler.Enqueue(msg)
-		}
-	}()
-
-	view.Start()
-	//window.Run()
+	conf := config.Parse()
+	fmt.Printf("%+v\n", conf)
 	
+	// session := requests.GetSessionToken("birkedal85@gmail.com", "SECRET")
+	// view := ui.NewView()
+	// ws_conn := requests.NewConnection(session)
+	// event_handler := events.NewHandler(session, view)
 
-	// for {
-	// 	msg, err := ws_conn.ReadMessage()
+	// go func() {
+	// 	for {
+	// 		msg, err := ws_conn.ReadMessage()
 
-	// 	if err != nil {
-	// 		panic("Connection lost")
+	// 		if err != nil {
+	// 			panic("Connection lost!")
+	// 		}
+
+	// 		event_handler.Enqueue(msg)
 	// 	}
+	// }()
 
-	// 	event_handler.Enqueue(msg)
-	// }
+	// view.Start()
 }

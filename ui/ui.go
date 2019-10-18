@@ -84,6 +84,7 @@ func (v *View) AddChannel(name string, user_list []string) {
 	v.activeChannel = v.pages.GetPageCount()
 
 	v.channels = append(v.channels, new_chan)
+	v.app.Draw()
 }
 
 func (v *View) getChannel(name string) *channel {
