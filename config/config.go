@@ -17,7 +17,11 @@ type confdata struct {
 func Parse() confdata {
 	var result confdata
 	curr_user, _ := user.Current()
-	filename := filepath.Join(curr_user.HomeDir, "/.irccloud/config.yaml")
+	conf_dir := filepath.Join(curr_user.HomeDir, "/.irccloud/")
+	filename := filepath.Join(conf_dir, "config.yaml")
+
+	// Don't care if this fails
+	os.Mkdir(conf_dir, 0700)
 
 	f, err := os.Open(filename)
 	if err != nil {
@@ -40,7 +44,7 @@ func writeDummyConfig(filename string) confdata {
 	}
 
 	content, _ := yaml.Marshal(&dummy)
-	if err := ioutil.WriteFile(filename, content, 0644); err != nil {
+	if err := ioutil.WriteFile(filename, content, 0600); err != nil {
 		fmt.Printf("Could not write config to to file %s\n", filename)
 	}
 
