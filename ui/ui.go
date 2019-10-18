@@ -42,12 +42,14 @@ func (v *View) Start() {
 			v.activeChannel = (v.activeChannel - 1 + total_active) % total_active
 			page := v.channels[v.activeChannel]
 			v.pages.SwitchToPage(page.name)
+			v.app.SetFocus(page.input)
 		}
 
 		if event.Key() == tcell.KeyRight {
 			v.activeChannel = (v.activeChannel + 1) % total_active
 			page := v.channels[v.activeChannel]
 			v.pages.SwitchToPage(page.name)
+			v.app.SetFocus(page.input)
 		}
 
 		return event
