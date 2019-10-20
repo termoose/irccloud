@@ -1,6 +1,7 @@
 package requests
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,11 +9,18 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type connection struct {
+type Connection struct {
 	WSConn *websocket.Conn
 }
 
-func NewConnection(token string) (*connection) {
+type sayMessage struct {
+	Method string `json:"_method"`
+	Cid    int    `json:"cid"`
+	To     string `json:"to"`
+	Msg    string `json:"msg"`
+}
+
+func NewConnection(token string) (*Connection) {
 	address := url.URL{Scheme: "wss", Host: "api.irccloud.com", Path: "/"}
 	log.Printf("Connecting to: %s\n", address.String())
 
@@ -29,12 +37,29 @@ func NewConnection(token string) (*connection) {
 
 	log.Printf("Connected!\n")
 
-	return &connection {
+	return &Connection {
 		WSConn: conn,
 	}
 }
 
-func (c *connection) ReadMessage() ([]byte, error) {
+func (c *Connection) SendMessage(cid int, channel, message string) {
+	msg := &sayMessage{
+		Method: "say",
+		Cid: cid,
+		To: channel,
+		Msg: message,
+	}
+
+	data, _ := json.Marshal(msg)
+
+	c.writeMessage([]byte(data))
+}
+
+func (c *Connection) writeMessage(message []byte) (error){
+	return c.WSConn.WriteMessage(websocket.TextMessage, message)
+}
+
+func (c *Connection) ReadMessage() ([]byte, error) {
 	_, msg, err := c.WSConn.ReadMessage()
 
 	return msg, err

@@ -77,7 +77,7 @@ func (e *eventHandler) handle(curr_event event) {
 					user_strings = append(user_strings, user_string.Nick)
 				}
 				
-				e.Window.AddChannel(event.Chan, user_strings)
+				e.Window.AddChannel(event.Chan, event.Cid, user_strings)
 				//log.Printf("event: %v\n", event.Chan)
 			}
 		}

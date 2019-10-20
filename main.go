@@ -13,9 +13,9 @@ func main() {
 	
 	session := requests.GetSessionToken(conf.Username, conf.Password)
 
-	view := ui.NewView()
-
 	ws_conn := requests.NewConnection(session)
+	view := ui.NewView(ws_conn)
+
 	event_handler := events.NewHandler(session, view)
 
 	go func() {

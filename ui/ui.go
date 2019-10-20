@@ -4,29 +4,32 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
-	_ "sort"
+	"github.com/termoose/irccloud/requests"
 )
 
 type channel struct {
 	layout *tview.Grid
 
-	name string
-	chat *tview.TextView
-	users *tview.List
-	input *tview.InputField
-	info *tview.TextView
+	name   string
+	chat   *tview.TextView
+	users  *tview.List
+	input  *tview.InputField
+	info   *tview.TextView
+	cid    int
 }
 
 type View struct {
-	pages *tview.Pages
-	app *tview.Application
+	pages         *tview.Pages
+	app           *tview.Application
 	activeChannel int
-	channels []channel
+	channels      []channel
+	websocket     *requests.Connection
 }
 
-func NewView() (*View) {
+func NewView(socket *requests.Connection) (*View) {
 	view := &View{
 		pages: tview.NewPages(),
+		websocket: socket,
 	}
 
 	return view
@@ -60,7 +63,7 @@ func (v *View) Start() {
 	}
 }
 
-func (v *View) AddChannel(name string, user_list []string) {
+func (v *View) AddChannel(name string, cid int, user_list []string) {
 	new_chan := channel{
 		layout: tview.NewGrid().SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
 		name: name,
@@ -68,7 +71,16 @@ func (v *View) AddChannel(name string, user_list []string) {
 		users: newListView(),
 		input: newTextInput(),
 		info: newTextView(name),
+		cid: cid,
 	}
+
+	// Set callback for handling message sending
+	new_chan.input.SetDoneFunc(func(key tcell.Key) {
+			if key == tcell.KeyEnter {
+				v.sendToBuffer(cid, name, new_chan.input.GetText())
+				new_chan.input.SetText("")
+			}
+	})
 
 	for _, user := range user_list {
 		new_chan.users.AddItem(user, user, 0, nil)
@@ -86,7 +98,13 @@ func (v *View) AddChannel(name string, user_list []string) {
 	v.activeChannel = v.pages.GetPageCount()
 
 	v.channels = append(v.channels, new_chan)
+
+	v.app.SetFocus(new_chan.input)
 	v.app.Draw()
+}
+
+func (v *View) sendToBuffer(cid int, channel, message string) {
+	v.websocket.SendMessage(cid, channel, message)
 }
 
 func (v *View) getChannel(name string) *channel {

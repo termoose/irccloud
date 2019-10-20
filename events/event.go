@@ -27,7 +27,7 @@ type eventData struct {
 	Members []member `json:"members"`
 	From    string   `json:"from"`
 	Msg     string   `json:"msg"`
-	//Events []event
+	Cid     int      `json:"cid"`
 }
 
 func parseBacklog(backlog []byte) []eventData {
