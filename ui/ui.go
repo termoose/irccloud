@@ -120,18 +120,32 @@ func (v *View) getChannel(name string) *channel {
 func (v *View) AddUser(channel, nick string) {
 	c := v.getChannel(channel)
 
-	c.users.AddItem(nick, nick, 0, nil)
+	if c != nil {
+		c.users.AddItem(nick, nick, 0, nil)
+	}
 }
 
 func (v *View) RemoveUser(channel, nick string) {
 	c := v.getChannel(channel)
-	list := c.users.FindItems(nick, nick, true, false)
 
-	for _, elem := range list {
-		found_nick, _ := c.users.GetItemText(elem)
-		if found_nick == nick {
-			c.users.RemoveItem(elem)
+	if c != nil {
+		list := c.users.FindItems(nick, nick, true, false)
+
+		for _, elem := range list {
+			found_nick, _ := c.users.GetItemText(elem)
+			if found_nick == nick {
+				c.users.RemoveItem(elem)
+			}
 		}
+	}
+}
+
+func (v *View) AddQuitEvent(channel, nick, hostmask, reason string) {
+	c := v.getChannel(channel)
+
+	if c != nil {
+		line := fmt.Sprintf("  <- %s quit (%s): %s\n", nick, hostmask, reason)
+		v.writeToBuffer(line, c)
 	}
 }
 

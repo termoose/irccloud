@@ -23,6 +23,10 @@ type channelInit struct {
 	Members []member `json:"members"`
 }
 
+type oob_include struct {
+	Url string
+}
+
 type eventData struct {
 	Type     string
 	Chan     string   `json:"chan"`
@@ -32,6 +36,7 @@ type eventData struct {
 	Cid      int      `json:"cid"`
 	Hostmask string   `json:"hostmask"`
 	Nick     string   `json:"nick"`
+	Data     []byte
 }
 
 func InitBacklog(token, url string, window *ui.View) {

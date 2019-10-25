@@ -3,37 +3,20 @@ package events
 import (
 	"encoding/json"
 	_ "fmt"
-	_ "github.com/termoose/irccloud/requests"
+	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
 	_ "log"
 )
 
-type event struct {
-	Bid int32   `json:"bid"`
-	Eid int32   `json:"eid"`
-	Type string `json:"type"`
-	Data []byte
-}
-
-type oob_include struct {
-	Url string
-}
-
-type buffer_msg struct {
-	From string
-	Chan string
-	Msg string
-}
-
 type eventHandler struct {
-	Queue chan event
+	Queue chan eventData
 	SessionToken string
 	Window *ui.View
 }
 
 func NewHandler(token string, w *ui.View) (*eventHandler) {
 	handler := &eventHandler{
-		Queue: make(chan event, 8),
+		Queue: make(chan eventData, 8),
 		SessionToken: token,
 		Window: w,
 	}
@@ -49,7 +32,7 @@ func NewHandler(token string, w *ui.View) (*eventHandler) {
 }
 
 func (e *eventHandler) Enqueue(msg []byte) {
-	current := event{}
+	current := eventData{}
 	json.Unmarshal(msg, &current)
 
 	// Attach raw message data
@@ -58,28 +41,51 @@ func (e *eventHandler) Enqueue(msg []byte) {
 	e.Queue <- current
 }
 
-func (e *eventHandler) handle(curr_event event) {
-	switch curr_event.Type {
+func (e *eventHandler) handleBacklog(url string) {
+	backlog := requests.GetBacklog(e.SessionToken, url)
+	backlogData := parseBacklog(backlog)
+
+	// First we initialize all channels
+	for _, event := range backlogData {
+		if event.Type == "channel_init" {
+			user_strings := []string{}
+			for _, user_string := range event.Members {
+				user_strings = append(user_strings, user_string.Nick)
+			}
+
+			e.Window.AddChannel(event.Chan, event.Cid, user_strings)
+		}
+	}
+
+	// Then we fill them with the message backlog, should we send these events
+	// to the event queue to have them arrive before live events
+	for _, event := range backlogData {
+		e.handle(event)
+	}
+}
+
+func (e *eventHandler) handle(curr eventData) {
+	switch curr.Type {
 	case "oob_include":
 		oob_data := &oob_include{}
-		json.Unmarshal(curr_event.Data, &oob_data)
-		InitBacklog(e.SessionToken, oob_data.Url, e.Window)
+		json.Unmarshal(curr.Data, &oob_data)
+		e.handleBacklog(oob_data.Url)
 
 	case "buffer_msg":
-		msg_data := &eventData{}
-		json.Unmarshal(curr_event.Data, &msg_data)
-		e.Window.AddBufferMsg(msg_data.Chan, msg_data.From, msg_data.Msg)
+		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg)
 
 	case "joined_channel":
-		join_data := &eventData{}
-		json.Unmarshal(curr_event.Data, &join_data)
-		e.Window.AddUser(join_data.Chan, join_data.Nick)
-		e.Window.AddJoinEvent(join_data.Chan, join_data.Nick, join_data.Hostmask)
+		e.Window.AddUser(curr.Chan, curr.Nick)
+		e.Window.AddJoinEvent(curr.Chan, curr.Nick, curr.Hostmask)
 
 	case "parted_channel":
-		part_data := &eventData{}
-		json.Unmarshal(curr_event.Data, &part_data)
-		e.Window.RemoveUser(part_data.Chan, part_data.Nick)
-		e.Window.AddPartEvent(part_data.Chan, part_data.Nick, part_data.Hostmask)
+		e.Window.RemoveUser(curr.Chan, curr.Nick)
+		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask)
+
+	case "quit":
+		//e.Window.RemoveUser(curr.Chan, curr.Nick)
+		//e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg)
+	default:
+		return
 	}
 }
