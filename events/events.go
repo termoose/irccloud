@@ -3,7 +3,7 @@ package events
 import (
 	"encoding/json"
 	_ "fmt"
-	"github.com/termoose/irccloud/requests"
+	_ "github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
 	_ "log"
 )
@@ -63,34 +63,23 @@ func (e *eventHandler) handle(curr_event event) {
 	case "oob_include":
 		oob_data := &oob_include{}
 		json.Unmarshal(curr_event.Data, &oob_data)
-		backlog := requests.GetBacklog(e.SessionToken, oob_data.Url)
-
-		//log.Printf("BACKLOG: %s\n", backlog)
-
-		backlogData := parseBacklog(backlog)
-
-		// First we initialize all channels
-		for _, event := range backlogData {
-			if event.Type == "channel_init" {
-				user_strings := []string{}
-				for _, user_string := range event.Members {
-					user_strings = append(user_strings, user_string.Nick)
-				}
-				
-				e.Window.AddChannel(event.Chan, event.Cid, user_strings)
-				//log.Printf("event: %v\n", event.Chan)
-			}
-		}
-
-		for _, event := range backlogData {
-			if event.Type == "buffer_msg" {
-				e.Window.AddBufferMsg(event.Chan, event.From, event.Msg)
-			}
-		}
+		InitBacklog(e.SessionToken, oob_data.Url, e.Window)
 
 	case "buffer_msg":
 		msg_data := &eventData{}
 		json.Unmarshal(curr_event.Data, &msg_data)
 		e.Window.AddBufferMsg(msg_data.Chan, msg_data.From, msg_data.Msg)
+
+	case "joined_channel":
+		join_data := &eventData{}
+		json.Unmarshal(curr_event.Data, &join_data)
+		e.Window.AddUser(join_data.Chan, join_data.Nick)
+		e.Window.AddJoinEvent(join_data.Chan, join_data.Nick, join_data.Hostmask)
+
+	case "parted_channel":
+		part_data := &eventData{}
+		json.Unmarshal(curr_event.Data, &part_data)
+		e.Window.RemoveUser(part_data.Chan, part_data.Nick)
+		e.Window.AddPartEvent(part_data.Chan, part_data.Nick, part_data.Hostmask)
 	}
 }

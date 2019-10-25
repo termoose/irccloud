@@ -117,6 +117,42 @@ func (v *View) getChannel(name string) *channel {
 	return nil
 }
 
+func (v *View) AddUser(channel, nick string) {
+	c := v.getChannel(channel)
+
+	c.users.AddItem(nick, nick, 0, nil)
+}
+
+func (v *View) RemoveUser(channel, nick string) {
+	c := v.getChannel(channel)
+
+	list := c.users.FindItems(nick, nick, true, false)
+	if len(list) > 0 {
+		// Remove the first occurence
+		c.users.RemoveItem(list[0])
+	}
+}
+
+func (v *View) AddPartEvent(channel, nick, hostmask string) {
+	c := v.getChannel(channel)
+
+	if c != nil {
+		line := fmt.Sprintf("  <- %s left (%s)\n", nick, hostmask)
+		c.chat.Write([]byte(line))
+		c.chat.ScrollToEnd()
+	}
+}
+
+func (v *View) AddJoinEvent(channel, nick, hostmask string) {
+	c := v.getChannel(channel)
+
+	if c != nil {
+		line := fmt.Sprintf("  -> %s joined (%s)\n", nick, hostmask)
+		c.chat.Write([]byte(line))
+		c.chat.ScrollToEnd()
+	}
+}
+
 func (v *View) AddBufferMsg(channel, from, msg string) {
 	c := v.getChannel(channel)
 
