@@ -138,8 +138,7 @@ func (v *View) AddPartEvent(channel, nick, hostmask string) {
 
 	if c != nil {
 		line := fmt.Sprintf("  <- %s left (%s)\n", nick, hostmask)
-		c.chat.Write([]byte(line))
-		c.chat.ScrollToEnd()
+		v.writeToBuffer(line, c)
 	}
 }
 
@@ -148,8 +147,7 @@ func (v *View) AddJoinEvent(channel, nick, hostmask string) {
 
 	if c != nil {
 		line := fmt.Sprintf("  -> %s joined (%s)\n", nick, hostmask)
-		c.chat.Write([]byte(line))
-		c.chat.ScrollToEnd()
+		v.writeToBuffer(line, c)
 	}
 }
 
@@ -158,10 +156,13 @@ func (v *View) AddBufferMsg(channel, from, msg string) {
 
 	if c != nil {
 		line := fmt.Sprintf("<%s> %s\n", from, msg)
-		c.chat.Write([]byte(line))
-		c.chat.ScrollToEnd()
+		v.writeToBuffer(line, c)
 	}
+}
 
+func (v *View) writeToBuffer(line string, c *channel) {
+	c.chat.Write([]byte(line))
+	c.chat.ScrollToEnd()
 	v.app.Draw()
 }
 
