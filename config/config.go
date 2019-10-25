@@ -17,11 +17,11 @@ type confdata struct {
 func Parse() confdata {
 	var result confdata
 	curr_user, _ := user.Current()
-	conf_dir := filepath.Join(curr_user.HomeDir, "/.irccloud/")
+	conf_dir := filepath.Join(curr_user.HomeDir, "/.config/irccloud/")
 	filename := filepath.Join(conf_dir, "config.yaml")
 
 	// Don't care if this fails
-	os.Mkdir(conf_dir, 0700)
+	os.MkdirAll(conf_dir, 0700)
 
 	f, err := os.Open(filename)
 	if err != nil {
