@@ -125,11 +125,13 @@ func (v *View) AddUser(channel, nick string) {
 
 func (v *View) RemoveUser(channel, nick string) {
 	c := v.getChannel(channel)
-
 	list := c.users.FindItems(nick, nick, true, false)
-	if len(list) > 0 {
-		// Remove the first occurence
-		c.users.RemoveItem(list[0])
+
+	for _, elem := range list {
+		found_nick, _ := c.users.GetItemText(elem)
+		if found_nick == nick {
+			c.users.RemoveItem(elem)
+		}
 	}
 }
 
