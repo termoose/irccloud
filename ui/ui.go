@@ -63,6 +63,10 @@ func (v *View) Start() {
 	}
 }
 
+func (v *View) Stop() {
+	v.app.Stop()
+}
+
 func (v *View) AddChannel(name string, cid int, user_list []string) {
 	new_chan := channel{
 		layout: tview.NewGrid().SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
@@ -138,6 +142,19 @@ func (v *View) RemoveUser(channel, nick string) {
 			}
 		}
 	}
+}
+
+func (v *View) findUserItem(channel, nick string) *channel {
+	c := v.getChannel(channel)
+
+	for i := 0; i < c.users.GetItemCount(); i++ {
+		found_nick, _ := c.users.GetItemText(i)
+		if nick == found_nick {
+			return c
+		}
+	}
+
+	return nil
 }
 
 func (v *View) AddQuitEvent(channel, nick, hostmask, reason string) {

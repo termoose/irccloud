@@ -15,6 +15,7 @@ func main() {
 
 	ws_conn := requests.NewConnection(session)
 	view := ui.NewView(ws_conn)
+	defer view.Stop()
 
 	event_handler := events.NewHandler(session, view)
 

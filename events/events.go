@@ -24,7 +24,7 @@ func NewHandler(token string, w *ui.View) (*eventHandler) {
 	// Start consumer thread
 	go func() {
 		for curr_event := range handler.Queue {
-			handler.handle(curr_event)
+			handler.handle(curr_event, false)
 		}
 	}()
 
@@ -39,6 +39,10 @@ func (e *eventHandler) Enqueue(msg []byte) {
 	current.Data = msg
 
 	e.Queue <- current
+}
+
+func (e *eventHandler) queueEvent(event eventData) {
+	e.Queue <- event
 }
 
 func (e *eventHandler) handleBacklog(url string) {
@@ -60,11 +64,11 @@ func (e *eventHandler) handleBacklog(url string) {
 	// Then we fill them with the message backlog, should we send these events
 	// to the event queue to have them arrive before live events
 	for _, event := range backlogData {
-		e.handle(event)
+		e.handle(event, true)
 	}
 }
 
-func (e *eventHandler) handle(curr eventData) {
+func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	switch curr.Type {
 	case "oob_include":
 		oob_data := &oob_include{}
@@ -75,16 +79,22 @@ func (e *eventHandler) handle(curr eventData) {
 		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg)
 
 	case "joined_channel":
-		e.Window.AddUser(curr.Chan, curr.Nick)
+		if !backlogEvent {
+			e.Window.AddUser(curr.Chan, curr.Nick)
+		}
 		e.Window.AddJoinEvent(curr.Chan, curr.Nick, curr.Hostmask)
 
 	case "parted_channel":
-		e.Window.RemoveUser(curr.Chan, curr.Nick)
+		if !backlogEvent {
+			e.Window.RemoveUser(curr.Chan, curr.Nick)
+		}
 		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask)
 
 	case "quit":
-		//e.Window.RemoveUser(curr.Chan, curr.Nick)
-		//e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg)
+		if !backlogEvent {
+			e.Window.RemoveUser(curr.Chan, curr.Nick)
+		}
+		e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg)
 	default:
 		return
 	}
