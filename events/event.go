@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
-	"log"
+	_ "log"
 )
 
 // {"nick":"sytse","ident_prefix":"","user":"sytse","userhost":"swielinga.nl","usermask":"sytse@swielinga.nl","realname":"Sytse Wielinga","account":null,"ircserver":"leguin.freenode.net","mode":"","away":false,"avatar":null,"avatar_url":null}
@@ -16,11 +16,6 @@ type member struct {
 	Server   string `json:"ircserver"`
 	UserHost string `json:"userhost"`
 	UserMask string `json:"usermask"`
-}
-
-type channelInit struct {
-	Name    string   `json:"chan"`
-	Members []member `json:"members"`
 }
 
 type oob_include struct {
@@ -73,17 +68,4 @@ func parseBacklog(backlog []byte) []eventData {
 	}
 
 	return backlog_data
-}
-
-// func initBacklog([]data backlogData) {
-// }
-
-func parseChannelInit(event []byte) channelInit {
-	chan_init := channelInit{}
-	json.Unmarshal(event, &chan_init)
-
-	log.Printf("Channel: %s\n", event)
-	//fmt.Printf("Users: %v\n", chan_init.Members)
-
-	return chan_init
 }
