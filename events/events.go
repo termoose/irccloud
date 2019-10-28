@@ -75,6 +75,21 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		json.Unmarshal(curr.Data, &oob_data)
 		e.handleBacklog(oob_data.Url)
 
+	case "channel_init":
+		if !backlogEvent {
+			user_strings := []string{}
+			for _, user_string := range curr.Members {
+				user_strings = append(user_strings, user_string.Nick)
+			}
+
+			e.Window.AddChannel(curr.Chan, curr.Cid, user_strings)
+		}
+
+	case "you_parted_channel":
+		if !backlogEvent {
+			e.Window.RemoveChannel(curr.Chan)
+		}
+
 	case "buffer_msg":
 		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg)
 
@@ -96,6 +111,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		}
 		e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg)
 	default:
+		//fmt.Printf("Event: %s\n", curr.Type)
 		return
 	}
 }

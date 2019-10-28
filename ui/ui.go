@@ -96,7 +96,7 @@ func (v *View) AddChannel(name string, cid int, user_list []string) {
 	new_chan.layout.AddItem(new_chan.input, 2, 0, 1, 2, 0, 0, false)
 	new_chan.layout.AddItem(new_chan.info,  0, 0, 1, 2, 0, 0, false)
 
-	v.pages.AddPage(name, new_chan.layout, true, true)
+	v.pages.AddAndSwitchToPage(name, new_chan.layout, true)
 
 	// FIXME: Might not be the best idea to keep this counter
 	v.activeChannel = v.pages.GetPageCount()
@@ -107,22 +107,37 @@ func (v *View) AddChannel(name string, cid int, user_list []string) {
 	v.app.Draw()
 }
 
+func remove(s []channel, i int) []channel {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+func (v *View) RemoveChannel(name string) {
+	v.pages.RemovePage(name)
+	v.activeChannel--;
+
+	index, _ := v.getChannel(name)
+	v.channels = remove(v.channels, index)
+
+	v.app.Draw()
+}
+
 func (v *View) sendToBuffer(cid int, channel, message string) {
 	v.websocket.SendMessage(cid, channel, message)
 }
 
-func (v *View) getChannel(name string) *channel {
+func (v *View) getChannel(name string) (int, *channel) {
 	for i, c := range v.channels {
 		if c.name == name {
-			return &v.channels[i]
+			return i, &v.channels[i]
 		}
 	}
 
-	return nil
+	return 0, nil
 }
 
 func (v *View) AddUser(channel, nick string) {
-	c := v.getChannel(channel)
+	_, c := v.getChannel(channel)
 
 	if c != nil {
 		c.users.AddItem(nick, nick, 0, nil)
@@ -130,7 +145,7 @@ func (v *View) AddUser(channel, nick string) {
 }
 
 func (v *View) RemoveUser(channel, nick string) {
-	c := v.getChannel(channel)
+	_, c := v.getChannel(channel)
 
 	if c != nil {
 		list := c.users.FindItems(nick, nick, true, false)
@@ -145,7 +160,7 @@ func (v *View) RemoveUser(channel, nick string) {
 }
 
 func (v *View) findUserItem(channel, nick string) *channel {
-	c := v.getChannel(channel)
+	_, c := v.getChannel(channel)
 
 	for i := 0; i < c.users.GetItemCount(); i++ {
 		found_nick, _ := c.users.GetItemText(i)
@@ -158,7 +173,7 @@ func (v *View) findUserItem(channel, nick string) *channel {
 }
 
 func (v *View) AddQuitEvent(channel, nick, hostmask, reason string) {
-	c := v.getChannel(channel)
+	_, c := v.getChannel(channel)
 
 	if c != nil {
 		line := fmt.Sprintf("  <- %s quit (%s): %s\n", nick, hostmask, reason)
@@ -167,7 +182,7 @@ func (v *View) AddQuitEvent(channel, nick, hostmask, reason string) {
 }
 
 func (v *View) AddPartEvent(channel, nick, hostmask string) {
-	c := v.getChannel(channel)
+	_, c := v.getChannel(channel)
 
 	if c != nil {
 		line := fmt.Sprintf("  <- %s left (%s)\n", nick, hostmask)
@@ -176,7 +191,7 @@ func (v *View) AddPartEvent(channel, nick, hostmask string) {
 }
 
 func (v *View) AddJoinEvent(channel, nick, hostmask string) {
-	c := v.getChannel(channel)
+	_, c := v.getChannel(channel)
 
 	if c != nil {
 		line := fmt.Sprintf("  -> %s joined (%s)\n", nick, hostmask)
@@ -185,7 +200,7 @@ func (v *View) AddJoinEvent(channel, nick, hostmask string) {
 }
 
 func (v *View) AddBufferMsg(channel, from, msg string) {
-	c := v.getChannel(channel)
+	_, c := v.getChannel(channel)
 
 	if c != nil {
 		line := fmt.Sprintf("<%s> %s\n", from, msg)
