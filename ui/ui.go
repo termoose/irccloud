@@ -232,7 +232,7 @@ func (v *View) writeToBuffer(line string, c *channel) {
 func newTextInput() *tview.InputField {
 	return tview.NewInputField().
 		SetFieldBackgroundColor(tcell.ColorBlack).
-			SetPlaceholder("type here...")
+		SetPlaceholder("type here...")
 }
 
 func newListView() *tview.List {
@@ -240,5 +240,8 @@ func newListView() *tview.List {
 }
 
 func newTextView(text string) *tview.TextView {
-	return tview.NewTextView().SetText(text).SetDynamicColors(true)
+	return tview.NewTextView().
+		SetText(text).
+		SetDynamicColors(true).
+		SetWordWrap(true)
 }
