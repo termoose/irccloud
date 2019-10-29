@@ -160,7 +160,7 @@ func (v *View) ChangeUserNick(channel, oldnick, newnick string) {
 
 	if err == nil {
 		c.users.SetItemText(index, newnick, newnick)
-		line := fmt.Sprintf("  [coral]%s[-:-:-] is now known as [gold]%s[-:-:-]\n", oldnick, newnick)
+		line := fmt.Sprintf("  [coral]%s[-:-:-] is now known as [gold]%s[-:-:-]", oldnick, newnick)
 
 		v.writeToBuffer(line, c)
 		v.app.Draw()
@@ -189,7 +189,7 @@ func (v *View) AddQuitEvent(channel, nick, hostmask, reason string) {
 	_, c := v.getChannel(channel)
 
 	if c != nil {
-		line := fmt.Sprintf("[blueviolet]  <- [blueviolet:-:b]%s[-:-:-] quit (%s): [blueviolet]%s[-:-:-]\n", nick, hostmask, reason)
+		line := fmt.Sprintf("[blueviolet]  <- [blueviolet:-:b]%s[-:-:-] quit (%s): [blueviolet]%s[-:-:-]", nick, hostmask, reason)
 		v.writeToBuffer(line, c)
 	}
 }
@@ -198,7 +198,7 @@ func (v *View) AddPartEvent(channel, nick, hostmask string) {
 	_, c := v.getChannel(channel)
 
 	if c != nil {
-		line := fmt.Sprintf("[blueviolet]  <- [blueviolet:-:b]%s[-:-:-] left (%s)\n",
+		line := fmt.Sprintf("[blueviolet]  <- [blueviolet:-:b]%s[-:-:-] left (%s)",
 			nick, hostmask)
 		v.writeToBuffer(line, c)
 	}
@@ -208,7 +208,7 @@ func (v *View) AddJoinEvent(channel, nick, hostmask string) {
 	_, c := v.getChannel(channel)
 
 	if c != nil {
-		line := fmt.Sprintf("[aquamarine]  -> [aquamarine:-:b]%s[-:-:-] joined (%s)\n",
+		line := fmt.Sprintf("[aquamarine]  -> [aquamarine:-:b]%s[-:-:-] joined (%s)",
 			nick, hostmask)
 		v.writeToBuffer(line, c)
 	}
@@ -218,13 +218,13 @@ func (v *View) AddBufferMsg(channel, from, msg string) {
 	_, c := v.getChannel(channel)
 
 	if c != nil {
-		line := fmt.Sprintf("<[-:-:b]%s[-:-:-]> %s\n", from, msg)
+		line := fmt.Sprintf("<[-:-:b]%s[-:-:-]> %s", from, msg)
 		v.writeToBuffer(line, c)
 	}
 }
 
 func (v *View) writeToBuffer(line string, c *channel) {
-	c.chat.Write([]byte(line))
+	c.chat.Write([]byte("\n" + line))
 	c.chat.ScrollToEnd()
 	v.app.Draw()
 }
