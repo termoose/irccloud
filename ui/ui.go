@@ -68,14 +68,15 @@ func (v *View) Stop() {
 	v.app.Stop()
 }
 
-func (v *View) AddChannel(name string, cid int, user_list []string) {
+func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
+	headerStr := fmt.Sprintf("[gold:-:b]%s[-:-:-]: %s", name, topic)
 	new_chan := channel{
 		layout: tview.NewGrid().SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
 		name: name,
 		chat: newTextView(""),
 		users: newListView(),
 		input: newTextInput(),
-		info: newTextView(name),
+		info: newTextView(headerStr),
 		cid: cid,
 	}
 
@@ -217,7 +218,7 @@ func (v *View) AddBufferMsg(channel, from, msg string) {
 	_, c := v.getChannel(channel)
 
 	if c != nil {
-		line := fmt.Sprintf("<%s> %s\n", from, msg)
+		line := fmt.Sprintf("<[-:-:b]%s[-:-:-]> %s\n", from, msg)
 		v.writeToBuffer(line, c)
 	}
 }

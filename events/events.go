@@ -57,7 +57,7 @@ func (e *eventHandler) handleBacklog(url string) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 
-			e.Window.AddChannel(event.Chan, event.Cid, user_strings)
+			e.Window.AddChannel(event.Chan, event.Topic.Text, event.Cid, user_strings)
 		}
 	}
 
@@ -82,7 +82,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 
-			e.Window.AddChannel(curr.Chan, curr.Cid, user_strings)
+			e.Window.AddChannel(curr.Chan, curr.Topic.Text, curr.Cid, user_strings)
 		}
 
 	case "you_parted_channel":

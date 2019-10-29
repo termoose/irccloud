@@ -24,6 +24,7 @@ func main() {
 			msg, err := ws_conn.ReadMessage()
 
 			if err != nil {
+				view.Stop()
 				panic("Connection lost!")
 			}
 

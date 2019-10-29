@@ -3,6 +3,8 @@
 ## TODO
 - ~Get text input working, return = send text to channel~
 - ~Make sure channel join opens a new buffer~
+- Create loading screen with splash art https://www.fiverr.com/beatscribe/create-ansi-or-ascii-art-in-classic-1990s-scene-style
+- Properly quit on Control+C so it doesn't mess up the terminal
 - New query window opened for new private messages
 - Show timestamps on chat messages
 - Support nick change messages

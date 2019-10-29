@@ -18,6 +18,11 @@ type member struct {
 	UserMask string `json:"usermask"`
 }
 
+// "topic":{"text":"http://www.pvv.org/~birkedal/term_0z_-_kose_til_krampa_tar_meg.mpg | HACK THE PLANET","time":1442082313,"nick":"ehamberg","ident_prefix":"","user":"sid18208","userhost":"gateway/web/irccloud.com/x-opdwzifkkmmqwndd","usermask":"sid18208@gateway/web/irccloud.com/x-opdwzifkkmmqwndd"}
+type topic struct {
+	Text string `json:"text"`
+}
+
 type oob_include struct {
 	Url string
 }
@@ -33,6 +38,7 @@ type eventData struct {
 	Nick     string   `json:"nick"`
 	NewNick  string   `json:"newnick"`
 	OldNick  string   `json:"oldnick"`
+	Topic    topic    `json:"topic"`
 	Data     []byte
 }
 
@@ -48,7 +54,7 @@ func InitBacklog(token, url string, window *ui.View) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 
-			window.AddChannel(event.Chan, event.Cid, user_strings)
+			window.AddChannel(event.Chan, event.Topic.Text, event.Cid, user_strings)
 			//log.Printf("event: %v\n", event.Chan)
 		}
 	}
