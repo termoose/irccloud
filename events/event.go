@@ -31,6 +31,8 @@ type eventData struct {
 	Cid      int      `json:"cid"`
 	Hostmask string   `json:"hostmask"`
 	Nick     string   `json:"nick"`
+	NewNick  string   `json:"newnick"`
+	OldNick  string   `json:"oldnick"`
 	Data     []byte
 }
 

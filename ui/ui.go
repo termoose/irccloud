@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -136,40 +137,51 @@ func (v *View) getChannel(name string) (int, *channel) {
 	return 0, nil
 }
 
+func (v *View) getUserIndex(channel, name string) (int, *channel, error) {
+	_, c := v.getChannel(channel)
+
+	if c != nil {
+		list := c.users.FindItems(name, name, true, false)
+
+		for _, elem := range list {
+			found_name, _ := c.users.GetItemText(elem)
+			if found_name == name {
+				return elem, c, nil
+			}
+		}
+	}
+
+	return 0, nil, errors.New("Could not find user and/or channel")
+}
+
+func (v *View) ChangeUserNick(channel, oldnick, newnick string) {
+	index, c, err := v.getUserIndex(channel, oldnick)
+
+	if err == nil {
+		c.users.SetItemText(index, newnick, newnick)
+		line := fmt.Sprintf("  [coral]%s[-:-:-] is now known as [gold]%s[-:-:-]\n", oldnick, newnick)
+
+		v.writeToBuffer(line, c)
+		v.app.Draw()
+	}
+}
+
 func (v *View) AddUser(channel, nick string) {
 	_, c := v.getChannel(channel)
 
 	if c != nil {
 		c.users.AddItem(nick, nick, 0, nil)
+		v.app.Draw()
 	}
 }
 
 func (v *View) RemoveUser(channel, nick string) {
-	_, c := v.getChannel(channel)
+	index, c, err := v.getUserIndex(channel, nick)
 
-	if c != nil {
-		list := c.users.FindItems(nick, nick, true, false)
-
-		for _, elem := range list {
-			found_nick, _ := c.users.GetItemText(elem)
-			if found_nick == nick {
-				c.users.RemoveItem(elem)
-			}
-		}
+	if err != nil {
+		c.users.RemoveItem(index)
+		v.app.Draw()
 	}
-}
-
-func (v *View) findUserItem(channel, nick string) *channel {
-	_, c := v.getChannel(channel)
-
-	for i := 0; i < c.users.GetItemCount(); i++ {
-		found_nick, _ := c.users.GetItemText(i)
-		if nick == found_nick {
-			return c
-		}
-	}
-
-	return nil
 }
 
 func (v *View) AddQuitEvent(channel, nick, hostmask, reason string) {

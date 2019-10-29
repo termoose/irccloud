@@ -105,6 +105,9 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		}
 		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask)
 
+	case "nickchange":
+		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick)
+
 	case "quit":
 		if !backlogEvent {
 			e.Window.RemoveUser(curr.Chan, curr.Nick)

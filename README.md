@@ -2,7 +2,7 @@
 
 ## TODO
 - ~Get text input working, return = send text to channel~
-- Make sure channel join opens a new buffer
+- ~Make sure channel join opens a new buffer~
 - New query window opened for new private messages
 - Show timestamps on chat messages
 - Support nick change messages
