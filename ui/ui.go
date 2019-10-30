@@ -20,6 +20,7 @@ type channel struct {
 }
 
 type View struct {
+	base_pages    *tview.Pages
 	pages         *tview.Pages
 	app           *tview.Application
 	activeChannel int
@@ -30,6 +31,7 @@ type View struct {
 func NewView(socket *requests.Connection) (*View) {
 	view := &View{
 		pages: tview.NewPages(),
+		base_pages: tview.NewPages(),
 		websocket: socket,
 	}
 
@@ -56,10 +58,21 @@ func (v *View) Start() {
 			v.app.SetFocus(page.input)
 		}
 
+		if event.Key() == tcell.KeyCtrlSpace {
+			v.ShowChannelSelector()
+		}
+
 		return event
 	})
 
-	if err := v.app.SetRoot(v.pages, true).SetFocus(v.pages).Run(); err != nil {
+	// Create "channels" layer at the bottom of `base_pages`
+	//v.base_pages.AddAndSwitchToPage("channels", v.pages, true)
+	v.base_pages.AddPage("channel", v.pages, true, true)
+
+	if err := v.app.
+		SetRoot(v.base_pages, true).
+		SetFocus(v.base_pages).
+		Run(); err != nil {
 		panic(err)
 	}
 }
@@ -68,10 +81,32 @@ func (v *View) Stop() {
 	v.app.Stop()
 }
 
+func (v *View) ShowChannelSelector() {
+	modal := func(p tview.Primitive, width, height int) tview.Primitive {
+		return tview.NewFlex().
+			AddItem(nil, 0, 1, false).
+			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(nil, 0, 1, false).
+			AddItem(p, height, 1, false).
+			AddItem(nil, 0, 1, false), width, 1, false).
+			AddItem(nil, 0, 1, false)
+	}
+
+	box := tview.NewBox().
+		SetBorder(true).
+		SetTitle("Select channel")
+
+	v.base_pages.AddPage("select_channel", modal(box, 40, 10), true, true)
+	//v.base_pages.AddPage("select_channel", box, true, true)
+}
+
 func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
 	headerStr := fmt.Sprintf("[gold:-:b]%s[-:-:-]: %s", name, topic)
 	new_chan := channel{
-		layout: tview.NewGrid().SetRows(1, 0, 1).SetColumns(20, 0, 20).SetBorders(true),
+		layout: tview.NewGrid().
+			SetRows(1, 0, 1).
+			SetColumns(20, 0, 20).
+			SetBorders(true),
 		name: name,
 		chat: newTextView(""),
 		users: newListView(),
