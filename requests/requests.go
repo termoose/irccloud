@@ -3,7 +3,7 @@ package requests
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	_ "io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -26,7 +26,7 @@ type formtoken_reply struct {
 	Token   string
 }
 
-func GetBacklog(token, endpoint string) []byte {
+func GetBacklog(token, endpoint string) *http.Response {
 	path := fmt.Sprintf("https://api.irccloud.com%s", endpoint)
 	client := http.Client{}
 
@@ -41,9 +41,11 @@ func GetBacklog(token, endpoint string) []byte {
 		log.Printf("Error fetching %s\n", path)
 	}
 
-	response, _ := ioutil.ReadAll(resp.Body)
+	return resp
 
-	return response
+	// response, _ := ioutil.ReadAll(resp.Body)
+
+	// return response
 }
 
 func GetSessionToken(user, pass string) string {

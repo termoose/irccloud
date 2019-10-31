@@ -5,7 +5,8 @@ import (
 	"sort"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
-	_ "log"
+	"log"
+	"net/http"
 )
 
 // {"nick":"sytse","ident_prefix":"","user":"sytse","userhost":"swielinga.nl","usermask":"sytse@swielinga.nl","realname":"Sytse Wielinga","account":null,"ircserver":"leguin.freenode.net","mode":"","away":false,"avatar":null,"avatar_url":null}
@@ -40,8 +41,16 @@ type eventData struct {
 	Nick     string   `json:"nick"`
 	NewNick  string   `json:"newnick"`
 	OldNick  string   `json:"oldnick"`
-	Topic    topic    `json:"topic"`
+	Topic    map[string]interface{}    `json:"topic"`
 	Data     []byte
+}
+
+func getTopic(e eventData) string {
+	if topic, ok := e.Topic["text"].(string); ok {
+		return topic
+	}
+
+	return "";
 }
 
 func InitBacklog(token, url string, window *ui.View) {
@@ -56,8 +65,8 @@ func InitBacklog(token, url string, window *ui.View) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 
-			window.AddChannel(event.Chan, event.Topic.Text, event.Cid, user_strings)
-			//log.Printf("event: %v\n", event.Chan)
+			topic := getTopic(event)
+			window.AddChannel(event.Chan, topic, event.Cid, user_strings)
 		}
 	}
 
@@ -69,12 +78,13 @@ func InitBacklog(token, url string, window *ui.View) {
 	}
 }
 
-func parseBacklog(backlog []byte) []eventData {
+func parseBacklog(backlog *http.Response) []eventData {
 	backlogData := []eventData{}
-	err := json.Unmarshal(backlog, &backlogData)
+	decoder := json.NewDecoder(backlog.Body)
+	err := decoder.Decode(&backlogData)
 
 	if err != nil {
-		return []eventData{}
+		log.Fatal(err)
 	}
 
 	sort.Slice(backlogData, func(i, j int) bool {

@@ -46,8 +46,8 @@ func (e *eventHandler) queueEvent(event eventData) {
 }
 
 func (e *eventHandler) handleBacklog(url string) {
-	backlog := requests.GetBacklog(e.SessionToken, url)
-	backlogData := parseBacklog(backlog)
+	backlogResponse := requests.GetBacklog(e.SessionToken, url)
+	backlogData := parseBacklog(backlogResponse)
 
 	// First we initialize all channels
 	for _, event := range backlogData {
@@ -57,7 +57,8 @@ func (e *eventHandler) handleBacklog(url string) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 
-			e.Window.AddChannel(event.Chan, event.Topic.Text, event.Cid, user_strings)
+			topic := getTopic(event)
+			e.Window.AddChannel(event.Chan, topic, event.Cid, user_strings)
 		}
 	}
 
@@ -81,8 +82,8 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 			for _, user_string := range curr.Members {
 				user_strings = append(user_strings, user_string.Nick)
 			}
-
-			e.Window.AddChannel(curr.Chan, curr.Topic.Text, curr.Cid, user_strings)
+			topic := getTopic(curr)
+			e.Window.AddChannel(curr.Chan, topic, curr.Cid, user_strings)
 		}
 
 	case "you_parted_channel":
