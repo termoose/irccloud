@@ -2,6 +2,7 @@ package events
 
 import (
 	"encoding/json"
+	"sort"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
 	_ "log"
@@ -29,6 +30,7 @@ type oob_include struct {
 
 type eventData struct {
 	Type     string
+	Time     int      `json:"eid"`
 	Chan     string   `json:"chan"`
 	Members  []member `json:"members"`
 	From     string   `json:"from"`
@@ -68,12 +70,16 @@ func InitBacklog(token, url string, window *ui.View) {
 }
 
 func parseBacklog(backlog []byte) []eventData {
-	backlog_data := []eventData{}
-	err := json.Unmarshal(backlog, &backlog_data)
+	backlogData := []eventData{}
+	err := json.Unmarshal(backlog, &backlogData)
 
 	if err != nil {
 		return []eventData{}
 	}
 
-	return backlog_data
+	sort.Slice(backlogData, func(i, j int) bool {
+		return backlogData[i].Time < backlogData[j].Time
+	})
+
+	return backlogData
 }
