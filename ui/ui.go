@@ -93,7 +93,7 @@ func (v *View) Start() {
 	// Create "channels" layer at the bottom of `basePages`
 	//v.basePages.AddAndSwitchToPage("channels", v.pages, true)
 	v.basePages.AddPage("channel", v.pages, true, true)
-	v.basePages.AddPage("splash", floatingModal(newANSIView(), 80, 20),
+	v.basePages.AddPage("splash", floatingModal(newANSIView(), 100, 35),
 		true, true)
 
 	if err := v.app.
@@ -297,8 +297,10 @@ func newListView() *tview.List {
 }
 
 func newANSIView() *tview.TextView {
+	art := readFile("test.ans")
 	return tview.NewTextView().
-		SetText("lollllert!!!! dude")
+		SetDynamicColors(true).
+		SetText(tview.TranslateANSI(art))
 }
 
 func newTextView(text string) *tview.TextView {
