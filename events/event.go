@@ -50,10 +50,10 @@ func getTopicName(e json.RawMessage) string {
 	err := json.Unmarshal(e, dst)
 
 	if err != nil {
-		return dst.Text;
+		log.Fatal(err)
 	}
 
-	return "";
+	return dst.Text;
 }
 
 func InitBacklog(token, url string, window *ui.View) {
