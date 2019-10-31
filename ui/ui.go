@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"github.com/sahilm/fuzzy"
 	"github.com/termoose/irccloud/requests"
 )
 
@@ -19,19 +20,29 @@ type channel struct {
 	cid    int
 }
 
+type channelList []channel
+
+func (c channelList) String(i int) string {
+	return c[i].name
+}
+
+func (c channelList) Len() int {
+	return len(c)
+}
+
 type View struct {
-	base_pages    *tview.Pages
+	basePages    *tview.Pages
 	pages         *tview.Pages
 	app           *tview.Application
 	activeChannel int
-	channels      []channel
+	channels      channelList
 	websocket     *requests.Connection
 }
 
 func NewView(socket *requests.Connection) (*View) {
 	view := &View{
 		pages: tview.NewPages(),
-		base_pages: tview.NewPages(),
+		basePages: tview.NewPages(),
 		websocket: socket,
 	}
 
@@ -65,13 +76,13 @@ func (v *View) Start() {
 		return event
 	})
 
-	// Create "channels" layer at the bottom of `base_pages`
-	//v.base_pages.AddAndSwitchToPage("channels", v.pages, true)
-	v.base_pages.AddPage("channel", v.pages, true, true)
+	// Create "channels" layer at the bottom of `basePages`
+	//v.basePages.AddAndSwitchToPage("channels", v.pages, true)
+	v.basePages.AddPage("channel", v.pages, true, true)
 
 	if err := v.app.
-		SetRoot(v.base_pages, true).
-		SetFocus(v.base_pages).
+		SetRoot(v.basePages, true).
+		SetFocus(v.basePages).
 		Run(); err != nil {
 		panic(err)
 	}
@@ -82,6 +93,7 @@ func (v *View) Stop() {
 }
 
 func (v *View) ShowChannelSelector() {
+	//fmt.Printf("Page count %d\n", v.basePages.GetPageCount())
 	modal := func(p tview.Primitive, width, height int) tview.Primitive {
 		return tview.NewFlex().
 			AddItem(nil, 0, 1, false).
@@ -92,12 +104,32 @@ func (v *View) ShowChannelSelector() {
 			AddItem(nil, 0, 1, false)
 	}
 
-	box := tview.NewBox().
-		SetBorder(true).
-		SetTitle("Select channel")
+	input := tview.NewInputField().
+		SetPlaceholder("Select channel").
+		SetFieldBackgroundColor(tcell.ColorGold).
+		SetFieldTextColor(tcell.ColorBlack)
 
-	v.base_pages.AddPage("select_channel", modal(box, 40, 10), true, true)
-	//v.base_pages.AddPage("select_channel", box, true, true)
+	input.SetAutocompleteFunc(
+		func(currentText string) []string {
+			results := fuzzy.FindFrom(currentText, v.channels)
+			resultStrs := make([]string, len(results))
+			for i, r := range results {
+				resultStrs[i] = v.channels[r.Index].name
+			}
+
+			if len(results) == 1 {
+				_, top_channel := v.getChannel(resultStrs[0])
+				v.pages.SwitchToPage(resultStrs[0])
+				v.app.SetFocus(top_channel.input)
+				v.basePages.RemovePage("select_channel")
+			}
+
+			return resultStrs
+		})
+
+
+	v.basePages.AddPage("select_channel", modal(input, 40, 10), true, true)
+	v.app.SetFocus(input)
 }
 
 func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
