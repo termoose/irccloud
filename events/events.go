@@ -57,7 +57,7 @@ func (e *eventHandler) handleBacklog(url string) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 
-			topic := getTopic(event)
+			topic := getTopicName(event.Topic)
 			e.Window.AddChannel(event.Chan, topic, event.Cid, user_strings)
 		}
 	}
@@ -82,7 +82,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 			for _, user_string := range curr.Members {
 				user_strings = append(user_strings, user_string.Nick)
 			}
-			topic := getTopic(curr)
+			topic := getTopicName(curr.Topic)
 			e.Window.AddChannel(curr.Chan, topic, curr.Cid, user_strings)
 		}
 
@@ -92,28 +92,28 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		}
 
 	case "buffer_msg":
-		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg)
+		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time)
 
 	case "joined_channel":
 		if !backlogEvent {
 			e.Window.AddUser(curr.Chan, curr.Nick)
 		}
-		e.Window.AddJoinEvent(curr.Chan, curr.Nick, curr.Hostmask)
+		e.Window.AddJoinEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time)
 
 	case "parted_channel":
 		if !backlogEvent {
 			e.Window.RemoveUser(curr.Chan, curr.Nick)
 		}
-		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask)
+		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time)
 
 	case "nickchange":
-		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick)
+		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick, curr.Time)
 
 	case "quit":
 		if !backlogEvent {
 			e.Window.RemoveUser(curr.Chan, curr.Nick)
 		}
-		e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg)
+		e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg, curr.Time)
 	default:
 		//fmt.Printf("Event: %s\n", curr.Type)
 		return

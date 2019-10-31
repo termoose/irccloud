@@ -31,23 +31,26 @@ type oob_include struct {
 
 type eventData struct {
 	Type     string
-	Time     int      `json:"eid"`
-	Chan     string   `json:"chan"`
-	Members  []member `json:"members"`
-	From     string   `json:"from"`
-	Msg      string   `json:"msg"`
-	Cid      int      `json:"cid"`
-	Hostmask string   `json:"hostmask"`
-	Nick     string   `json:"nick"`
-	NewNick  string   `json:"newnick"`
-	OldNick  string   `json:"oldnick"`
-	Topic    map[string]interface{}    `json:"topic"`
+	Time     int64            `json:"eid"`
+	Chan     string           `json:"chan"`
+	Members  []member         `json:"members"`
+	From     string           `json:"from"`
+	Msg      string           `json:"msg"`
+	Cid      int              `json:"cid"`
+	Hostmask string           `json:"hostmask"`
+	Nick     string           `json:"nick"`
+	NewNick  string           `json:"newnick"`
+	OldNick  string           `json:"oldnick"`
+	Topic    json.RawMessage  `json:"topic"`
 	Data     []byte
 }
 
-func getTopic(e eventData) string {
-	if topic, ok := e.Topic["text"].(string); ok {
-		return topic
+func getTopicName(e json.RawMessage) string {
+	dst := &topic{}
+	err := json.Unmarshal(e, dst)
+
+	if err != nil {
+		return dst.Text;
 	}
 
 	return "";
@@ -65,7 +68,7 @@ func InitBacklog(token, url string, window *ui.View) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 
-			topic := getTopic(event)
+			topic := getTopicName(event.Topic)
 			window.AddChannel(event.Chan, topic, event.Cid, user_strings)
 		}
 	}
@@ -73,7 +76,7 @@ func InitBacklog(token, url string, window *ui.View) {
 	// Then we fill them with the message backlog
 	for _, event := range backlogData {
 		if event.Type == "buffer_msg" {
-			window.AddBufferMsg(event.Chan, event.From, event.Msg)
+			window.AddBufferMsg(event.Chan, event.From, event.Msg, event.Time)
 		}
 	}
 }
