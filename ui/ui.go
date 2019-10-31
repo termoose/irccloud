@@ -262,7 +262,8 @@ func newTextInput() *tview.InputField {
 }
 
 func newListView() *tview.List {
-	return tview.NewList().ShowSecondaryText(false)
+	return tview.NewList().ShowSecondaryText(false).
+		SetSelectedFocusOnly(true)
 }
 
 func newTextView(text string) *tview.TextView {

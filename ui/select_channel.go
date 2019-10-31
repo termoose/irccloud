@@ -7,7 +7,6 @@ import (
 )
 
 func (v *View) ShowChannelSelector() {
-	//fmt.Printf("Page count %d\n", v.basePages.GetPageCount())
 	modal := func(p tview.Primitive, width, height int) tview.Primitive {
 		return tview.NewFlex().
 			AddItem(nil, 0, 1, false).
@@ -31,36 +30,32 @@ func (v *View) ShowChannelSelector() {
 				resultStrs[i] = v.channels[r.Index].name
 			}
 
-			// If there's a unique match we switch immediately
+			// If there's a unique match we switch immediately?
 			if len(results) == 1 {
-				_, top_channel := v.getChannel(resultStrs[0])
-				v.basePages.RemovePage("select_channel")
-				v.pages.SwitchToPage(resultStrs[0])
-				v.app.SetFocus(top_channel.input)
+				//_, top_channel := v.getChannel(resultStrs[0])
+				//v.gotoPage(top_channel)
 			}
 
-			if len(results) > 0 {
-				input.SetDoneFunc(func(key tcell.Key) {
-					if key == tcell.KeyEnter {
-						_, selected := v.getChannel(input.GetText())
-						if selected != nil {
-							v.gotoPage(selected)
-						} else {
-							_, first_pick := v.getChannel(resultStrs[0])
-							v.gotoPage(first_pick)
-						}
-						
+			input.SetDoneFunc(func(key tcell.Key) {
+				if len(results) > 0 && key == tcell.KeyEnter {
+					_, selected := v.getChannel(input.GetText())
+					if selected != nil {
+						v.gotoPage(selected)
+					} else {
+						_, first_pick := v.getChannel(resultStrs[0])
+						v.gotoPage(first_pick)
 					}
-				})
-			}
+				}
+			})
 
 			return resultStrs
 		})
 
-
 	v.basePages.AddPage("select_channel", modal(input, 40, 10), true, true)
 	v.app.SetFocus(input)
 }
+
+
 
 func (v *View) gotoPage(c *channel) {
 	v.basePages.RemovePage("select_channel")
