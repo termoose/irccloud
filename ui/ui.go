@@ -30,7 +30,7 @@ func (c channelList) Len() int {
 }
 
 type View struct {
-	basePages    *tview.Pages
+	basePages     *tview.Pages
 	pages         *tview.Pages
 	app           *tview.Application
 	activeChannel int
@@ -69,7 +69,11 @@ func (v *View) Start() {
 		}
 
 		if event.Key() == tcell.KeyCtrlSpace {
-			v.ShowChannelSelector()
+			if v.basePages.HasPage("select_channel") {
+				v.hideChannelSelector()
+			} else {
+				v.showChannelSelector()
+			}
 		}
 
 		return event

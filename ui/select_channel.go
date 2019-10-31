@@ -6,7 +6,7 @@ import (
 	"github.com/sahilm/fuzzy"
 )
 
-func (v *View) ShowChannelSelector() {
+func (v *View) showChannelSelector() {
 	modal := func(p tview.Primitive, width, height int) tview.Primitive {
 		return tview.NewFlex().
 			AddItem(nil, 0, 1, false).
@@ -55,10 +55,12 @@ func (v *View) ShowChannelSelector() {
 	v.app.SetFocus(input)
 }
 
-
+func (v *View) hideChannelSelector() {
+	v.basePages.RemovePage("select_channel")
+}
 
 func (v *View) gotoPage(c *channel) {
-	v.basePages.RemovePage("select_channel")
+	v.hideChannelSelector()
 	v.pages.SwitchToPage(c.name)
 	v.app.SetFocus(c.input)
 }
