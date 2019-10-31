@@ -7,15 +7,15 @@ import (
 )
 
 func (v *View) showChannelSelector() {
-	modal := func(p tview.Primitive, width, height int) tview.Primitive {
-		return tview.NewFlex().
-			AddItem(nil, 0, 1, false).
-			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(nil, 0, 1, false).
-			AddItem(p, height, 1, false).
-			AddItem(nil, 0, 1, false), width, 1, false).
-			AddItem(nil, 0, 1, false)
-	}
+	// modal := func(p tview.Primitive, width, height int) tview.Primitive {
+	// 	return tview.NewFlex().
+	// 		AddItem(nil, 0, 1, false).
+	// 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+	// 		AddItem(nil, 0, 1, false).
+	// 		AddItem(p, height, 1, false).
+	// 		AddItem(nil, 0, 1, false), width, 1, false).
+	// 		AddItem(nil, 0, 1, false)
+	// }
 
 	input := tview.NewInputField().
 		SetPlaceholder("Select channel").
@@ -51,7 +51,7 @@ func (v *View) showChannelSelector() {
 			return resultStrs
 		})
 
-	v.basePages.AddPage("select_channel", modal(input, 40, 10), true, true)
+	v.basePages.AddPage("select_channel", floatingModal(input, 40, 10), true, true)
 	v.app.SetFocus(input)
 }
 

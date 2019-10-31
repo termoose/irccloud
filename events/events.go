@@ -67,6 +67,9 @@ func (e *eventHandler) handleBacklog(url string) {
 	for _, event := range backlogData {
 		e.handle(event, true)
 	}
+
+	// Remove splash art when backlog has been parsed
+	e.Window.HideSplash()
 }
 
 func (e *eventHandler) handle(curr eventData, backlogEvent bool) {

@@ -39,6 +39,16 @@ type View struct {
 	websocket     *requests.Connection
 }
 
+func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
+	return tview.NewFlex().
+		AddItem(nil, 0, 1, false).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(nil, 0, 1, false).
+		AddItem(p, height, 1, false).
+		AddItem(nil, 0, 1, false), width, 1, false).
+		AddItem(nil, 0, 1, false)
+}
+
 func NewView(socket *requests.Connection) (*View) {
 	view := &View{
 		pages: tview.NewPages(),
@@ -83,6 +93,8 @@ func (v *View) Start() {
 	// Create "channels" layer at the bottom of `basePages`
 	//v.basePages.AddAndSwitchToPage("channels", v.pages, true)
 	v.basePages.AddPage("channel", v.pages, true, true)
+	v.basePages.AddPage("splash", floatingModal(newANSIView(), 80, 20),
+		true, true)
 
 	if err := v.app.
 		SetRoot(v.basePages, true).
@@ -90,6 +102,10 @@ func (v *View) Start() {
 		Run(); err != nil {
 		panic(err)
 	}
+}
+
+func (v *View) HideSplash() {
+	v.basePages.RemovePage("splash")
 }
 
 func (v *View) Stop() {
@@ -278,6 +294,11 @@ func newTextInput() *tview.InputField {
 func newListView() *tview.List {
 	return tview.NewList().ShowSecondaryText(false).
 		SetSelectedFocusOnly(true)
+}
+
+func newANSIView() *tview.TextView {
+	return tview.NewTextView().
+		SetText("lollllert!!!! dude")
 }
 
 func newTextView(text string) *tview.TextView {
