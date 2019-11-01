@@ -113,7 +113,7 @@ func (v *View) Stop() {
 }
 
 func headerString(name, topic string) string {
-	return fmt.Sprintf("[gold:-:b]%s[-:-:-]: %s", name, topic)
+	return fmt.Sprintf("[gold:-:b]%s[-:-:-]: [lime:-:-]%s[-:-:-]", name, topic)
 }
 
 func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
@@ -205,8 +205,16 @@ func (v *View) getUserIndex(channel, name string) (int, *channel, error) {
 	return 0, nil, errors.New("Could not find user and/or channel")
 }
 
-func (v *View) ChangeChannelTopic(channel, newtopic string) {
-	//_, c := v.getChannel(channel)
+func (v *View) ChangeTopic(channel, author, newtopic string, time int64) {
+	_, c := v.getChannel(channel)
+
+	if c != nil {
+		ts := getTimestamp(time)
+		c.info.SetText(headerString(channel, newtopic))
+		line := fmt.Sprintf("[-:-:d]%s[-:-:-]  [-:-:b]%s[-:-:-] changed topic: [lime:-:-]%s[-:-:-]", ts, author, newtopic)
+		v.writeToBuffer(line, c)
+		v.app.Draw()
+	}
 }
 
 func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64) {

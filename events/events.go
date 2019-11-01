@@ -113,7 +113,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick, curr.Time)
 
 	case "channel_topic":
-		//e.Window.ChangeChannelTopic(curr.Chan, curr.Topic)
+		e.Window.ChangeTopic(curr.Chan, curr.Author, getTopicText(curr.Topic), curr.Time)
 
 	case "quit":
 		if !backlogEvent {

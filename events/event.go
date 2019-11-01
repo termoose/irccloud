@@ -42,7 +42,19 @@ type eventData struct {
 	NewNick  string           `json:"newnick"`
 	OldNick  string           `json:"oldnick"`
 	Topic    json.RawMessage  `json:"topic"`
+	Author   string           `json:"author"`
 	Data     []byte
+}
+
+func getTopicText(e json.RawMessage) string {
+	var dst string
+	err := json.Unmarshal(e, &dst)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return dst
 }
 
 func getTopicName(e json.RawMessage) string {
@@ -53,7 +65,7 @@ func getTopicName(e json.RawMessage) string {
 		log.Fatal(err)
 	}
 
-	return dst.Text;
+	return dst.Text
 }
 
 func InitBacklog(token, url string, window *ui.View) {
