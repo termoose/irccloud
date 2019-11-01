@@ -18,6 +18,7 @@ type member struct {
 	Server   string `json:"ircserver"`
 	UserHost string `json:"userhost"`
 	UserMask string `json:"usermask"`
+	Mode     string `json:"mode"`
 }
 
 // "topic":{"text":"http://www.pvv.org/~birkedal/term_0z_-_kose_til_krampa_tar_meg.mpg | HACK THE PLANET","time":1442082313,"nick":"ehamberg","ident_prefix":"","user":"sid18208","userhost":"gateway/web/irccloud.com/x-opdwzifkkmmqwndd","usermask":"sid18208@gateway/web/irccloud.com/x-opdwzifkkmmqwndd"}
@@ -55,6 +56,19 @@ func getTopicText(e json.RawMessage) string {
 	}
 
 	return dst
+}
+
+func UserModeString(mode string) string {
+	switch mode {
+	case "o":
+		return "@"
+	case "h":
+		return "%"
+	case "v":
+		return "+"
+	default:
+		return ""
+	}
 }
 
 func getTopicName(e json.RawMessage) string {
