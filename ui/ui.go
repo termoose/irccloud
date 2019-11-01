@@ -93,8 +93,8 @@ func (v *View) Start() {
 	// Create "channels" layer at the bottom of `basePages`
 	//v.basePages.AddAndSwitchToPage("channels", v.pages, true)
 	v.basePages.AddPage("channel", v.pages, true, true)
-	v.basePages.AddPage("splash", floatingModal(newANSIView(), 100, 35),
-		true, true)
+	// v.basePages.AddPage("splash", floatingModal(newANSIView(), 100, 35),
+	// 	true, true)
 
 	if err := v.app.
 		SetRoot(v.basePages, true).
@@ -112,8 +112,11 @@ func (v *View) Stop() {
 	v.app.Stop()
 }
 
+func headerString(name, topic string) string {
+	return fmt.Sprintf("[gold:-:b]%s[-:-:-]: %s", name, topic)
+}
+
 func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
-	headerStr := fmt.Sprintf("[gold:-:b]%s[-:-:-]: %s", name, topic)
 	new_chan := channel{
 		layout: tview.NewGrid().
 			SetRows(1, 0, 1).
@@ -123,7 +126,7 @@ func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
 		chat: newTextView(""),
 		users: newListView(),
 		input: newTextInput(),
-		info: newTextView(headerStr),
+		info: newTextView(headerString(name, topic)),
 		cid: cid,
 	}
 
@@ -200,6 +203,10 @@ func (v *View) getUserIndex(channel, name string) (int, *channel, error) {
 	}
 
 	return 0, nil, errors.New("Could not find user and/or channel")
+}
+
+func (v *View) ChangeChannelTopic(channel, newtopic string) {
+	//_, c := v.getChannel(channel)
 }
 
 func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64) {
@@ -300,6 +307,8 @@ func newANSIView() *tview.TextView {
 	art := readFile("test.ans")
 	return tview.NewTextView().
 		SetDynamicColors(true).
+		SetWrap(false).
+		//	SetText(art)
 		SetText(tview.TranslateANSI(art))
 }
 

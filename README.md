@@ -6,8 +6,9 @@
 - Create loading screen with splash art https://www.fiverr.com/beatscribe/create-ansi-or-ascii-art-in-classic-1990s-scene-style
 - Properly quit on Control+C so it doesn't mess up the terminal
 - New query window opened for new private messages
-- Show timestamps on chat messages
-- Support nick change messages
+- Create a loading bar based on `numbuffers` in `oob_include`
+- ~Show timestamps on chat messages~
+- ~Support nick change messages~
 - Let /topic show the topic in chat
 - ~Show non-message data in chat like join/leave events~
 - Let the first image always be the server info

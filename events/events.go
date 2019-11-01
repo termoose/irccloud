@@ -69,7 +69,7 @@ func (e *eventHandler) handleBacklog(url string) {
 	}
 
 	// Remove splash art when backlog has been parsed
-	e.Window.HideSplash()
+	//e.Window.HideSplash()
 }
 
 func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
@@ -111,6 +111,9 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 
 	case "nickchange":
 		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick, curr.Time)
+
+	case "channel_topic":
+		//e.Window.ChangeChannelTopic(curr.Chan, curr.Topic)
 
 	case "quit":
 		if !backlogEvent {
