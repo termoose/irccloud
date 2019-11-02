@@ -50,4 +50,3 @@ func writeDummyConfig(filename string) confdata {
 
 	return dummy
 }
-

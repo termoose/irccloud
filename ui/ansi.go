@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"log"
 	"io/ioutil"
+	"log"
 )
 
 func readFile(filename string) string {
@@ -11,6 +11,6 @@ func readFile(filename string) string {
 	if err != nil {
 		log.Fatal("Could not open file!")
 	}
-	
+
 	return string(dat)
 }

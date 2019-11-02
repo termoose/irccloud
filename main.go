@@ -1,17 +1,16 @@
 package main
 
 import (
+	"github.com/termoose/irccloud/config"
 	"github.com/termoose/irccloud/events"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
-	_ "fmt"
-	"github.com/termoose/irccloud/config"
 	"log"
 )
 
 func main() {
 	conf := config.Parse()
-	
+
 	session := requests.GetSessionToken(conf.Username, conf.Password)
 
 	ws_conn := requests.NewConnection(session)

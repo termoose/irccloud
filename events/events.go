@@ -10,16 +10,16 @@ import (
 )
 
 type eventHandler struct {
-	Queue chan eventData
+	Queue        chan eventData
 	SessionToken string
-	Window *ui.View
+	Window       *ui.View
 }
 
-func NewHandler(token string, w *ui.View) (*eventHandler) {
+func NewHandler(token string, w *ui.View) *eventHandler {
 	handler := &eventHandler{
-		Queue: make(chan eventData, 8),
+		Queue:        make(chan eventData, 8),
 		SessionToken: token,
-		Window: w,
+		Window:       w,
 	}
 
 	// Start consumer thread
@@ -137,6 +137,6 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 }
 
 func unixtimeToDate(t int64) string {
-	tm := time.Unix(t / 1000000, 0)
+	tm := time.Unix(t/1000000, 0)
 	return tm.Format("Mon Jan 2 15:04:05 UTC 2006")
 }

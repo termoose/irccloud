@@ -7,26 +7,26 @@ import (
 )
 
 type View struct {
-	basePages     *tview.Pages
-	pages         *tview.Pages
-	app           *tview.Application
-	channels      channelList
-	websocket     *requests.Connection
+	basePages *tview.Pages
+	pages     *tview.Pages
+	app       *tview.Application
+	channels  channelList
+	websocket *requests.Connection
 }
 
 func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
 	return tview.NewFlex().
 		AddItem(nil, 0, 1, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-		AddItem(nil, 0, 1, false).
-		AddItem(p, height, 1, false).
-		AddItem(nil, 0, 1, false), width, 1, false).
+			AddItem(nil, 0, 1, false).
+			AddItem(p, height, 1, false).
+			AddItem(nil, 0, 1, false), width, 1, false).
 		AddItem(nil, 0, 1, false)
 }
 
-func NewView(socket *requests.Connection) (*View) {
+func NewView(socket *requests.Connection) *View {
 	view := &View{
-		pages: tview.NewPages(),
+		pages:     tview.NewPages(),
 		basePages: tview.NewPages(),
 		websocket: socket,
 	}

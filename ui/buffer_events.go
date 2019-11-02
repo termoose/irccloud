@@ -50,7 +50,7 @@ func (v *View) AddJoinEvent(channel, nick, hostmask string, time int64) {
 }
 
 func getTimestamp(t int64) string {
-	tm := time.Unix(t / 1000000, 0)
+	tm := time.Unix(t/1000000, 0)
 	hour, min, _ := tm.Clock()
 	return tview.Escape(fmt.Sprintf("[%02d:%02d]", hour, min))
 }

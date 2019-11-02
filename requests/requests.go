@@ -3,7 +3,6 @@ package requests
 import (
 	"encoding/json"
 	"fmt"
-	_ "io/ioutil"
 	"log"
 	"net/http"
 	"net/url"

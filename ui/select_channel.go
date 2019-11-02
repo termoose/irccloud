@@ -54,5 +54,3 @@ func (v *View) gotoPage(c *channel) {
 	v.pages.SwitchToPage(c.name)
 	v.app.SetFocus(c.input)
 }
-
-

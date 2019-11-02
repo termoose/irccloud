@@ -8,7 +8,6 @@ import (
 
 type channel struct {
 	layout *tview.Grid
-
 	name   string
 	chat   *tview.TextView
 	users  *tview.List
@@ -65,20 +64,20 @@ func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
 			SetRows(1, 0, 1).
 			SetColumns(20, 0, 20).
 			SetBorders(true),
-		name: name,
-		chat: newTextView(""),
+		name:  name,
+		chat:  newTextView(""),
 		users: newListView(),
 		input: newTextInput(),
-		info: newTextView(headerString(name, topic)),
-		cid: cid,
+		info:  newTextView(headerString(name, topic)),
+		cid:   cid,
 	}
 
 	// Set callback for handling message sending
 	new_chan.input.SetDoneFunc(func(key tcell.Key) {
-			if key == tcell.KeyEnter {
-				v.sendToBuffer(cid, name, new_chan.input.GetText())
-				new_chan.input.SetText("")
-			}
+		if key == tcell.KeyEnter {
+			v.sendToBuffer(cid, name, new_chan.input.GetText())
+			new_chan.input.SetText("")
+		}
 	})
 
 	for _, user := range user_list {
@@ -87,9 +86,9 @@ func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
 
 	// Layout
 	new_chan.layout.AddItem(new_chan.users, 0, 2, 3, 1, 0, 0, false)
-	new_chan.layout.AddItem(new_chan.chat,  1, 0, 1, 2, 0, 0, false)
+	new_chan.layout.AddItem(new_chan.chat, 1, 0, 1, 2, 0, 0, false)
 	new_chan.layout.AddItem(new_chan.input, 2, 0, 1, 2, 0, 0, false)
-	new_chan.layout.AddItem(new_chan.info,  0, 0, 1, 2, 0, 0, false)
+	new_chan.layout.AddItem(new_chan.info, 0, 0, 1, 2, 0, 0, false)
 
 	v.pages.AddAndSwitchToPage(name, new_chan.layout, true)
 
