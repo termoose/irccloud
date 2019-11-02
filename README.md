@@ -1,7 +1,7 @@
 # IRCCloud Terminal Client
 
 Do you miss the R(etro) in IRC? Still have dreams about BitchX? Who doesn't!
-For all of this to work you need an IRCCloud account. If you're not familiar with [IRCCloud](http://irccloud.com), then check it out!
+For all of this to work you need an IRCCloud account. If you're not familiar with [IRCCloud](http://irccloud.com), then I think you should check it out!
 
 ![Live demo!](preview.gif)
 
