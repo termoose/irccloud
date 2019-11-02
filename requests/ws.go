@@ -22,7 +22,6 @@ type sayMessage struct {
 
 func NewConnection(token string) *Connection {
 	address := url.URL{Scheme: "wss", Host: "api.irccloud.com", Path: "/"}
-	log.Printf("Connecting to: %s\n", address.String())
 
 	headers := http.Header{}
 	headers.Add("User-Agent", "irccloud-cli")
@@ -32,10 +31,8 @@ func NewConnection(token string) *Connection {
 	conn, _, err := websocket.DefaultDialer.Dial(address.String(), headers)
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-
-	log.Printf("Connected!\n")
 
 	return &Connection{
 		WSConn: conn,
