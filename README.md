@@ -3,9 +3,17 @@
 Do you miss the R(etro) in IRC? Still have dreams about BitchX? Who doesn't!
 For all of this to work you need an IRCCloud account. If you're not familiar with [IRCCloud](http://irccloud.com), then check it out!
 
-## Preview
-
 ![Live demo!](preview.gif)
+
+## Navigation
+
+- <kbd>Ctrl</kbd>+<kbd>Space</kbd>: Select channel
+- <kbd>Home</kbd>, <kbd>Ctrl</kbd>+<kbd>a</kbd>: Move to the beginning of the line
+- <kbd>End</kbd>, <kbd>Ctrl</kbd>+<kbd>e</kbd>: Move to the end of the line
+- <kbd>Ctrl</kbd>+<kbd>k</kbd>: Delete from the cursor to the end of the line
+- <kbd>Ctrl</kbd>+<kbd>w</kbd>: Delete the last word before the cursor
+- <kbd>Ctrl</kbd>+<kbd>u</kbd>: Delete the entire line
+
 
 ## TODO
 - ~Get text input working, return = send text to channel~
