@@ -2,10 +2,11 @@ package events
 
 import (
 	"encoding/json"
-	_ "fmt"
+	"fmt"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
 	_ "log"
+	"time"
 )
 
 type eventHandler struct {
@@ -115,6 +116,15 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	case "channel_topic":
 		e.Window.ChangeTopic(curr.Chan, curr.Author, getTopicText(curr.Topic), curr.Time)
 
+	case "makebuffer":
+		if curr.BufferType == "conversation" && !curr.Archived {
+			header := fmt.Sprintf("Chatting since: %s", unixtimeToDate(curr.Created))
+			e.Window.AddChannel(curr.Name, header, curr.Cid, []string{})
+		}
+
+	case "buffer_me_msg":
+		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time)
+
 	case "quit":
 		if !backlogEvent {
 			e.Window.RemoveUser(curr.Chan, curr.Nick)
@@ -124,4 +134,9 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		//fmt.Printf("Event: %s\n", curr.Type)
 		return
 	}
+}
+
+func unixtimeToDate(t int64) string {
+	tm := time.Unix(t / 1000000, 0)
+	return tm.Format("Mon Jan 2 15:04:05 UTC 2006")
 }

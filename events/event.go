@@ -31,19 +31,23 @@ type oob_include struct {
 }
 
 type eventData struct {
-	Type     string
-	Time     int64            `json:"eid"`
-	Chan     string           `json:"chan"`
-	Members  []member         `json:"members"`
-	From     string           `json:"from"`
-	Msg      string           `json:"msg"`
-	Cid      int              `json:"cid"`
-	Hostmask string           `json:"hostmask"`
-	Nick     string           `json:"nick"`
-	NewNick  string           `json:"newnick"`
-	OldNick  string           `json:"oldnick"`
-	Topic    json.RawMessage  `json:"topic"`
-	Author   string           `json:"author"`
+	Type       string
+	Time       int64            `json:"eid"`
+	Chan       string           `json:"chan"`
+	Members    []member         `json:"members"`
+	From       string           `json:"from"`
+	Msg        string           `json:"msg"`
+	Cid        int              `json:"cid"`
+	Hostmask   string           `json:"hostmask"`
+	Nick       string           `json:"nick"`
+	NewNick    string           `json:"newnick"`
+	OldNick    string           `json:"oldnick"`
+	Topic      json.RawMessage  `json:"topic"`
+	Author     string           `json:"author"`
+	BufferType string           `json:"buffer_type"`
+	Name       string           `json:"name"`
+	Archived   bool             `json:"archived"`
+	Created    int64            `json:"created"`
 	Data     []byte
 }
 

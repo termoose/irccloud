@@ -34,7 +34,6 @@ type View struct {
 	basePages     *tview.Pages
 	pages         *tview.Pages
 	app           *tview.Application
-	activeChannel int
 	channels      channelList
 	websocket     *requests.Connection
 }
@@ -63,22 +62,6 @@ func (v *View) Start() {
 	v.app = tview.NewApplication()
 
 	v.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		total_active := v.pages.GetPageCount()
-
-		if event.Key() == tcell.KeyLeft {
-			v.activeChannel = (v.activeChannel - 1 + total_active) % total_active
-			page := v.channels[v.activeChannel]
-			v.pages.SwitchToPage(page.name)
-			v.app.SetFocus(page.input)
-		}
-
-		if event.Key() == tcell.KeyRight {
-			v.activeChannel = (v.activeChannel + 1) % total_active
-			page := v.channels[v.activeChannel]
-			v.pages.SwitchToPage(page.name)
-			v.app.SetFocus(page.input)
-		}
-
 		if event.Key() == tcell.KeyCtrlSpace {
 			if v.basePages.HasPage("select_channel") {
 				v.hideChannelSelector()
@@ -150,9 +133,6 @@ func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
 
 	v.pages.AddAndSwitchToPage(name, new_chan.layout, true)
 
-	// FIXME: Might not be the best idea to keep this counter
-	v.activeChannel = v.pages.GetPageCount()
-
 	v.channels = append(v.channels, new_chan)
 
 	v.app.SetFocus(new_chan.input)
@@ -166,7 +146,6 @@ func remove(s []channel, i int) []channel {
 
 func (v *View) RemoveChannel(name string) {
 	v.pages.RemovePage(name)
-	v.activeChannel--;
 
 	index, _ := v.getChannel(name)
 	v.channels = remove(v.channels, index)
@@ -186,6 +165,12 @@ func (v *View) getChannel(name string) (int, *channel) {
 	}
 
 	return 0, nil
+}
+
+func (v *View) HasChannel(channel string) bool {
+	_, c := v.getChannel(channel)
+
+	return c != nil
 }
 
 func (v *View) getUserIndex(channel, name string) (int, *channel, error) {

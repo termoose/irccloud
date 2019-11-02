@@ -6,6 +6,7 @@ import (
 	"github.com/termoose/irccloud/ui"
 	_ "fmt"
 	"github.com/termoose/irccloud/config"
+	"log"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 
 			if err != nil {
 				view.Stop()
-				panic("Connection lost!")
+				log.Fatal(err)
 			}
 
 			event_handler.Enqueue(msg)
