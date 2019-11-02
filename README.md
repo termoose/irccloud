@@ -14,6 +14,27 @@ For all of this to work you need an IRCCloud account. If you're not familiar wit
 - <kbd>Ctrl</kbd>+<kbd>w</kbd>: Delete the last word before the cursor
 - <kbd>Ctrl</kbd>+<kbd>u</kbd>: Delete the entire line
 
+## Installing
+
+```bash
+go get -u github.com/termoose/irccloud
+```
+
+Make sure `$GOPATH/bin` is added to the `$PATH` variable.
+
+```bash
+irccloud
+```
+
+On the first run a config file will be generated for you in `~/.config/irccloud`, update it with your IRCCloud username and password.
+
+### Homebrew
+
+Soon
+
+### Flatpak (Linux)
+
+Probably soon
 
 ## TODO
 - ~Get text input working, return = send text to channel~
