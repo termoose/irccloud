@@ -63,7 +63,7 @@ func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
 		layout: tview.NewGrid().
 			SetRows(1, 0, 1).
 			SetColumns(20, 0, 20).
-			SetBorders(true),
+			SetBorders(false),
 		name:  name,
 		chat:  newTextView(""),
 		users: newListView(),

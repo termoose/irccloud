@@ -32,7 +32,7 @@ func (v *View) AddUser(channel, nick string) {
 
 func (v *View) RemoveUser(channel, nick string) {
 	index, c, err := v.getUserIndex(channel, nick)
-
+	
 	if err != nil && c != nil {
 		c.users.RemoveItem(index)
 		v.app.Draw()

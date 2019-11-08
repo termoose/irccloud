@@ -75,13 +75,17 @@ func (v *View) sendToBuffer(cid int, channel, message string) {
 
 func newTextInput() *tview.InputField {
 	return tview.NewInputField().
-		SetFieldBackgroundColor(tcell.ColorBlack).
+		SetFieldBackgroundColor(tcell.ColorDimGray).
+		SetFieldTextColor(tcell.ColorWhite).
+		SetPlaceholderTextColor(tcell.ColorWhiteSmoke).
 		SetPlaceholder("type here...")
 }
 
 func newListView() *tview.List {
-	return tview.NewList().ShowSecondaryText(false).
-		SetSelectedFocusOnly(true)
+	return tview.NewList().
+		ShowSecondaryText(false).
+		SetSelectedFocusOnly(true).
+		SetMainTextColor(tcell.ColorLightSkyBlue)
 }
 
 func newANSIView() *tview.TextView {
