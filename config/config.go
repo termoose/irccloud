@@ -9,19 +9,19 @@ import (
 	"path/filepath"
 )
 
-type confdata struct {
+type Confdata struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }
 
-func Parse() confdata {
-	var result confdata
+func Parse() Confdata {
+	var result Confdata
 	curr_user, _ := user.Current()
 	conf_dir := filepath.Join(curr_user.HomeDir, "/.config/irccloud/")
 	filename := filepath.Join(conf_dir, "config.yaml")
 
 	// Don't care if this fails
-	os.MkdirAll(conf_dir, 0700)
+	_ = os.MkdirAll(conf_dir, 0700)
 
 	f, err := os.Open(filename)
 	if err != nil {
@@ -37,12 +37,11 @@ func Parse() confdata {
 	return result
 }
 
-func writeDummyConfig(filename string) confdata {
-	dummy := confdata{
+func writeDummyConfig(filename string) Confdata {
+	dummy := Confdata{
 		Username: "your_username_here",
 		Password: "secret_password_here",
 	}
-
 	content, _ := yaml.Marshal(&dummy)
 	if err := ioutil.WriteFile(filename, content, 0600); err != nil {
 		fmt.Printf("Could not write config to to file %s\n", filename)

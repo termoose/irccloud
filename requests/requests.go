@@ -41,10 +41,6 @@ func GetBacklog(token, endpoint string) *http.Response {
 	}
 
 	return resp
-
-	// response, _ := ioutil.ReadAll(resp.Body)
-
-	// return response
 }
 
 func GetSessionToken(user, pass string) string {

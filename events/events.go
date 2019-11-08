@@ -34,12 +34,14 @@ func NewHandler(token string, w *ui.View) *eventHandler {
 
 func (e *eventHandler) Enqueue(msg []byte) {
 	current := eventData{}
-	json.Unmarshal(msg, &current)
+	err := json.Unmarshal(msg, &current)
 
-	// Attach raw message data
-	current.Data = msg
+	if err == nil {
+		// Attach raw message data
+		current.Data = msg
 
-	e.Queue <- current
+		e.Queue <- current
+	}
 }
 
 func (e *eventHandler) queueEvent(event eventData) {
@@ -77,8 +79,11 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	switch curr.Type {
 	case "oob_include":
 		oob_data := &oob_include{}
-		json.Unmarshal(curr.Data, &oob_data)
-		e.handleBacklog(oob_data.Url)
+		err := json.Unmarshal(curr.Data, &oob_data)
+
+		if err == nil {
+			e.handleBacklog(oob_data.Url)
+		}
 
 	case "channel_init":
 		if !backlogEvent {

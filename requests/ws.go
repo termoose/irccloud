@@ -49,7 +49,7 @@ func (c *Connection) SendMessage(cid int, channel, message string) {
 
 	data, _ := json.Marshal(msg)
 
-	c.writeMessage([]byte(data))
+	_ = c.writeMessage([]byte(data))
 }
 
 func (c *Connection) writeMessage(message []byte) error {
