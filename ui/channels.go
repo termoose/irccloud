@@ -46,20 +46,20 @@ func (v *View) HasChannel(channel string) bool {
 	return c != nil
 }
 
-func (v *View) ChangeTopic(channel, author, newtopic string, time int64) {
+func (v *View) ChangeTopic(channel, author, newTopic string, time int64) {
 	_, c := v.getChannel(channel)
 
 	if c != nil {
 		ts := getTimestamp(time)
-		c.info.SetText(headerString(channel, newtopic))
-		line := fmt.Sprintf("[-:-:d]%s[-:-:-]  [-:-:b]%s[-:-:-] changed topic: [lime:-:-]%s[-:-:-]", ts, author, newtopic)
+		c.info.SetText(headerString(channel, newTopic))
+		line := fmt.Sprintf("[-:-:d]%s[-:-:-]  [-:-:b]%s[-:-:-] changed topic: [lime:-:-]%s[-:-:-]", ts, author, newTopic)
 		v.writeToBuffer(line, c)
 		v.app.Draw()
 	}
 }
 
-func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
-	new_chan := channel{
+func (v *View) AddChannel(name, topic string, cid int, userList []string) {
+	newChan := channel{
 		layout: tview.NewGrid().
 			SetRows(1, 0, 1).
 			SetColumns(20, 0, 20).
@@ -73,28 +73,28 @@ func (v *View) AddChannel(name, topic string, cid int, user_list []string) {
 	}
 
 	// Set callback for handling message sending
-	new_chan.input.SetDoneFunc(func(key tcell.Key) {
+	newChan.input.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
-			v.sendToBuffer(cid, name, new_chan.input.GetText())
-			new_chan.input.SetText("")
+			v.sendToBuffer(cid, name, newChan.input.GetText())
+			newChan.input.SetText("")
 		}
 	})
 
-	for _, user := range user_list {
-		new_chan.users.AddItem(user, user, 0, nil)
+	for _, user := range userList {
+		newChan.users.AddItem(user, user, 0, nil)
 	}
 
 	// Layout
-	new_chan.layout.AddItem(new_chan.users, 0, 2, 3, 1, 0, 0, false)
-	new_chan.layout.AddItem(new_chan.chat, 1, 0, 1, 2, 0, 0, false)
-	new_chan.layout.AddItem(new_chan.input, 2, 0, 1, 2, 0, 0, false)
-	new_chan.layout.AddItem(new_chan.info, 0, 0, 1, 2, 0, 0, false)
+	newChan.layout.AddItem(newChan.users, 0, 2, 3, 1, 0, 0, false)
+	newChan.layout.AddItem(newChan.chat, 1, 0, 1, 2, 0, 0, false)
+	newChan.layout.AddItem(newChan.input, 2, 0, 1, 2, 0, 0, false)
+	newChan.layout.AddItem(newChan.info, 0, 0, 1, 2, 0, 0, false)
 
-	v.pages.AddAndSwitchToPage(name, new_chan.layout, true)
+	v.pages.AddAndSwitchToPage(name, newChan.layout, true)
 
-	v.channels = append(v.channels, new_chan)
+	v.channels = append(v.channels, newChan)
 
-	v.app.SetFocus(new_chan.input)
+	v.app.SetFocus(newChan.input)
 	v.app.Draw()
 }
 

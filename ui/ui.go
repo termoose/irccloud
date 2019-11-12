@@ -9,6 +9,7 @@ import (
 type View struct {
 	basePages *tview.Pages
 	pages     *tview.Pages
+	layout    *tview.Grid
 	app       *tview.Application
 	channels  channelList
 	websocket *requests.Connection
@@ -27,6 +28,9 @@ func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
 func NewView(socket *requests.Connection) *View {
 	view := &View{
 		pages:     tview.NewPages(),
+		layout:    tview.NewGrid().
+			SetRows(1, 0).
+			SetColumns(0),
 		basePages: tview.NewPages(),
 		websocket: socket,
 	}
@@ -53,9 +57,11 @@ func (v *View) Start() {
 	// v.basePages.AddPage("splash", floatingModal(newANSIView(), 100, 35),
 	// 	true, true)
 
+	v.layout.AddItem(v.basePages, 1, 0, 1, 1, 0, 0, true)
+
 	if err := v.app.
-		SetRoot(v.basePages, true).
-		SetFocus(v.basePages).
+		SetRoot(v.layout, true).
+		SetFocus(v.layout).
 		Run(); err != nil {
 		panic(err)
 	}
