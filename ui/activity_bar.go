@@ -19,16 +19,13 @@ type activityBar struct {
 }
 
 func NewActivityBar() *activityBar {
-	bar := &activityBar{
+	return &activityBar{
 		bar: tview.NewTextView().
 			SetDynamicColors(true).
 			SetWrap(false).
 			SetScrollable(false),
-		//SetText("[-:green:-]lol[-:-:-][-:blue:-]dude[-:-:-]"),
 		buffers: make(map[string]activityBuffer),
 	}
-
-	return bar
 }
 
 func (b *activityBar) updateActivityBar() {

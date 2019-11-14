@@ -44,10 +44,6 @@ func (e *eventHandler) Enqueue(msg []byte) {
 	}
 }
 
-func (e *eventHandler) queueEvent(event eventData) {
-	e.Queue <- event
-}
-
 func (e *eventHandler) handleBacklog(url string) {
 	backlogResponse := requests.GetBacklog(e.SessionToken, url)
 	backlogData := parseBacklog(backlogResponse)

@@ -15,7 +15,6 @@ func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64) {
 		line := fmt.Sprintf("[-:-:d]%s[-:-:-]  [coral]%s[-:-:-] is now known as [gold]%s[-:-:-]", ts, oldnick, newnick)
 
 		v.writeToBuffer(line, c)
-		v.app.Draw()
 	}
 }
 
@@ -66,7 +65,8 @@ func (v *View) AddBufferMsg(channel, from, msg string, time int64) {
 }
 
 func (v *View) writeToBuffer(line string, c *channel) {
-	_, _ = c.chat.Write([]byte("\n" + line))
-	c.chat.ScrollToEnd()
-	v.app.Draw()
+	v.app.QueueUpdateDraw(func() {
+		_, _ = c.chat.Write([]byte("\n" + line))
+		c.chat.ScrollToEnd()
+	})
 }

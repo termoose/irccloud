@@ -54,7 +54,7 @@ func (v *View) ChangeTopic(channel, author, newTopic string, time int64) {
 		c.info.SetText(headerString(channel, newTopic))
 		line := fmt.Sprintf("[-:-:d]%s[-:-:-]  [-:-:b]%s[-:-:-] changed topic: [lime:-:-]%s[-:-:-]", ts, author, newTopic)
 		v.writeToBuffer(line, c)
-		v.app.Draw()
+		//v.app.Draw()
 	}
 }
 
@@ -80,22 +80,23 @@ func (v *View) AddChannel(name, topic string, cid int, userList []string) {
 		}
 	})
 
-	for _, user := range userList {
-		newChan.users.AddItem(user, user, 0, nil)
-	}
+	v.app.QueueUpdateDraw(func() {
+		for _, user := range userList {
+			newChan.users.AddItem(user, user, 0, nil)
+		}
 
-	// Layout
-	newChan.layout.AddItem(newChan.users, 0, 2, 3, 1, 0, 0, false)
-	newChan.layout.AddItem(newChan.chat, 1, 0, 1, 2, 0, 0, false)
-	newChan.layout.AddItem(newChan.input, 2, 0, 1, 2, 0, 0, false)
-	newChan.layout.AddItem(newChan.info, 0, 0, 1, 2, 0, 0, false)
+		// Layout
+		newChan.layout.AddItem(newChan.users, 0, 2, 3, 1, 0, 0, false)
+		newChan.layout.AddItem(newChan.chat, 1, 0, 1, 2, 0, 0, false)
+		newChan.layout.AddItem(newChan.input, 2, 0, 1, 2, 0, 0, false)
+		newChan.layout.AddItem(newChan.info, 0, 0, 1, 2, 0, 0, false)
 
-	v.pages.AddAndSwitchToPage(name, newChan.layout, true)
+		v.pages.AddAndSwitchToPage(name, newChan.layout, true)
 
-	v.channels = append(v.channels, newChan)
+		v.channels = append(v.channels, newChan)
 
-	v.app.SetFocus(newChan.input)
-	v.app.Draw()
+		v.app.SetFocus(newChan.input)
+	})
 }
 
 func remove(s []channel, i int) []channel {
@@ -104,10 +105,10 @@ func remove(s []channel, i int) []channel {
 }
 
 func (v *View) RemoveChannel(name string) {
-	v.pages.RemovePage(name)
+	v.app.QueueUpdateDraw(func() {
+		v.pages.RemovePage(name)
+	})
 
 	index, _ := v.getChannel(name)
 	v.channels = remove(v.channels, index)
-
-	v.app.Draw()
 }

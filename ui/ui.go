@@ -34,7 +34,7 @@ func NewView(socket *requests.Connection) *View {
 			SetColumns(0),
 		basePages: tview.NewPages(),
 		websocket: socket,
-		Activity: NewActivityBar(),
+		Activity:  NewActivityBar(),
 	}
 
 	return view
