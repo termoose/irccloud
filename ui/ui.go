@@ -13,6 +13,7 @@ type View struct {
 	app       *tview.Application
 	channels  channelList
 	websocket *requests.Connection
+	Activity  *activityBar
 }
 
 func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
@@ -33,6 +34,7 @@ func NewView(socket *requests.Connection) *View {
 			SetColumns(0),
 		basePages: tview.NewPages(),
 		websocket: socket,
+		Activity: NewActivityBar(),
 	}
 
 	return view
@@ -58,6 +60,7 @@ func (v *View) Start() {
 	// 	true, true)
 
 	v.layout.AddItem(v.basePages, 1, 0, 1, 1, 0, 0, true)
+	v.layout.AddItem(v.Activity.bar, 0, 0, 1, 1, 0, 0, false)
 
 	if err := v.app.
 		SetRoot(v.layout, true).

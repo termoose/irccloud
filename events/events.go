@@ -101,6 +101,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		}
 
 	case "buffer_msg":
+		e.Window.Activity.RegisterActivity(curr.Chan)
 		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time)
 
 	case "joined_channel":
