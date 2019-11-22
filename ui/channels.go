@@ -14,6 +14,7 @@ type channel struct {
 	input  *tview.InputField
 	info   *tview.TextView
 	cid    int
+	bid    int
 }
 
 type channelList []channel
@@ -30,7 +31,7 @@ func headerString(name, topic string) string {
 	return fmt.Sprintf("[gold:-:b]%s[-:-:-]: [lime:-:-]%s[-:-:-]", name, topic)
 }
 
-func (v *View) getChannel(name string) (int, *channel) {
+func (v *View) getChannelByName(name string) (int, *channel) {
 	for i, c := range v.channels {
 		if c.name == name {
 			return i, &v.channels[i]
@@ -40,14 +41,24 @@ func (v *View) getChannel(name string) (int, *channel) {
 	return 0, nil
 }
 
+func (v *View) getChannel(name string, bid int) (int, *channel) {
+	for i, c := range v.channels {
+		if c.name == name && c.bid == bid {
+			return i, &v.channels[i]
+		}
+	}
+
+	return 0, nil
+}
+
 func (v *View) HasChannel(channel string) bool {
-	_, c := v.getChannel(channel)
+	_, c := v.getChannelByName(channel)
 
 	return c != nil
 }
 
-func (v *View) ChangeTopic(channel, author, newTopic string, time int64) {
-	_, c := v.getChannel(channel)
+func (v *View) ChangeTopic(channel, author, newTopic string, time int64, bid int) {
+	_, c := v.getChannel(channel, bid)
 
 	if c != nil {
 		ts := getTimestamp(time)
@@ -58,7 +69,7 @@ func (v *View) ChangeTopic(channel, author, newTopic string, time int64) {
 	}
 }
 
-func (v *View) AddChannel(name, topic string, cid int, userList []string) {
+func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 	newChan := channel{
 		layout: tview.NewGrid().
 			SetRows(1, 0, 1).
@@ -70,6 +81,7 @@ func (v *View) AddChannel(name, topic string, cid int, userList []string) {
 		input: newTextInput(),
 		info:  newTextView(headerString(name, topic)),
 		cid:   cid,
+		bid:   bid,
 	}
 
 	// Set callback for handling message sending
@@ -109,6 +121,6 @@ func (v *View) RemoveChannel(name string) {
 		v.pages.RemovePage(name)
 	})
 
-	index, _ := v.getChannel(name)
+	index, _ := v.getChannelByName(name)
 	v.channels = remove(v.channels, index)
 }

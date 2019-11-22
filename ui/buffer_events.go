@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64) {
+func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64, bid int) {
 	v.app.QueueUpdate(func() {
-		index, c, err := v.getUserIndex(channel, oldnick)
+		index, c, err := v.getUserIndex(channel, oldnick, bid)
 
 		if err == nil {
 			ts := getTimestamp(time)
@@ -20,9 +20,9 @@ func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64) {
 	})
 }
 
-func (v *View) AddQuitEvent(channel, nick, hostmask, reason string, time int64) {
+func (v *View) AddQuitEvent(channel, nick, hostmask, reason string, time int64, bid int) {
 	v.app.QueueUpdate(func() {
-		_, c := v.getChannel(channel)
+		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
 			ts := getTimestamp(time)
@@ -32,9 +32,9 @@ func (v *View) AddQuitEvent(channel, nick, hostmask, reason string, time int64) 
 	})
 }
 
-func (v *View) AddPartEvent(channel, nick, hostmask string, time int64) {
+func (v *View) AddPartEvent(channel, nick, hostmask string, time int64, bid int) {
 	v.app.QueueUpdate(func() {
-		_, c := v.getChannel(channel)
+		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
 			ts := getTimestamp(time)
@@ -44,9 +44,9 @@ func (v *View) AddPartEvent(channel, nick, hostmask string, time int64) {
 	})
 }
 
-func (v *View) AddJoinEvent(channel, nick, hostmask string, time int64) {
+func (v *View) AddJoinEvent(channel, nick, hostmask string, time int64, bid int) {
 	v.app.QueueUpdate(func() {
-		_, c := v.getChannel(channel)
+		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
 			ts := getTimestamp(time)
@@ -62,9 +62,9 @@ func getTimestamp(t int64) string {
 	return tview.Escape(fmt.Sprintf("[%02d:%02d]", hour, min))
 }
 
-func (v *View) AddBufferMsg(channel, from, msg string, time int64) {
+func (v *View) AddBufferMsg(channel, from, msg string, time int64, bid int) {
 	v.app.QueueUpdate(func() {
-		_, c := v.getChannel(channel)
+		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
 			ts := getTimestamp(time)

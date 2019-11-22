@@ -38,6 +38,7 @@ type eventData struct {
 	From       string          `json:"from"`
 	Msg        string          `json:"msg"`
 	Cid        int             `json:"cid"`
+	Bid        int             `json:"bid"`
 	Hostmask   string          `json:"hostmask"`
 	Nick       string          `json:"nick"`
 	NewNick    string          `json:"newnick"`
@@ -99,14 +100,14 @@ func InitBacklog(token, url string, window *ui.View) {
 			}
 
 			topic := getTopicName(event.Topic)
-			window.AddChannel(event.Chan, topic, event.Cid, user_strings)
+			window.AddChannel(event.Chan, topic, event.Cid, event.Bid, user_strings)
 		}
 	}
 
 	// Then we fill them with the message backlog
 	for _, event := range backlogData {
 		if event.Type == "buffer_msg" {
-			window.AddBufferMsg(event.Chan, event.From, event.Msg, event.Time)
+			window.AddBufferMsg(event.Chan, event.From, event.Msg, event.Time, event.Bid)
 		}
 	}
 }

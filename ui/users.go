@@ -4,8 +4,8 @@ import (
 	"errors"
 )
 
-func (v *View) getUserIndex(channel, name string) (int, *channel, error) {
-	_, c := v.getChannel(channel)
+func (v *View) getUserIndex(channel, name string, bid int) (int, *channel, error) {
+	_, c := v.getChannel(channel, bid)
 
 	if c != nil {
 		list := c.users.FindItems(name, name, true, false)
@@ -21,9 +21,9 @@ func (v *View) getUserIndex(channel, name string) (int, *channel, error) {
 	return 0, nil, errors.New("Could not find user and/or channel")
 }
 
-func (v *View) AddUser(channel, nick string) {
+func (v *View) AddUser(channel, nick string, bid int) {
 	v.app.QueueUpdate(func() {
-		_, c := v.getChannel(channel)
+		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
 			c.users.AddItem(nick, nick, 0, nil)
@@ -31,9 +31,9 @@ func (v *View) AddUser(channel, nick string) {
 	})
 }
 
-func (v *View) RemoveUser(channel, nick string) {
+func (v *View) RemoveUser(channel, nick string, bid int) {
 	v.app.QueueUpdate(func() {
-		index, c, err := v.getUserIndex(channel, nick)
+		index, c, err := v.getUserIndex(channel, nick, bid)
 
 		if err == nil {
 			c.users.RemoveItem(index)

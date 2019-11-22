@@ -57,7 +57,7 @@ func (e *eventHandler) handleBacklog(url string) {
 			}
 
 			topic := getTopicName(event.Topic)
-			e.Window.AddChannel(event.Chan, topic, event.Cid, user_strings)
+			e.Window.AddChannel(event.Chan, topic, event.Cid, event.Bid, user_strings)
 		}
 	}
 
@@ -90,7 +90,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 				user_strings = append(user_strings, user_string.Nick)
 			}
 			topic := getTopicName(curr.Topic)
-			e.Window.AddChannel(curr.Chan, topic, curr.Cid, user_strings)
+			e.Window.AddChannel(curr.Chan, topic, curr.Cid, curr.Bid, user_strings)
 		}
 
 	case "you_parted_channel":
@@ -100,40 +100,40 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 
 	case "buffer_msg":
 		e.Window.Activity.RegisterActivity(curr.Chan, e.Window)
-		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time)
+		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time, curr.Bid)
 
 	case "joined_channel":
 		if !backlogEvent {
-			e.Window.AddUser(curr.Chan, curr.Nick)
+			e.Window.AddUser(curr.Chan, curr.Nick, curr.Bid)
 		}
-		e.Window.AddJoinEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time)
+		e.Window.AddJoinEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time, curr.Bid)
 
 	case "parted_channel":
 		if !backlogEvent {
-			e.Window.RemoveUser(curr.Chan, curr.Nick)
+			e.Window.RemoveUser(curr.Chan, curr.Nick, curr.Bid)
 		}
-		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time)
+		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time, curr.Bid)
 
 	case "nickchange":
-		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick, curr.Time)
+		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick, curr.Time, curr.Bid)
 
 	case "channel_topic":
-		e.Window.ChangeTopic(curr.Chan, curr.Author, getTopicText(curr.Topic), curr.Time)
+		e.Window.ChangeTopic(curr.Chan, curr.Author, getTopicText(curr.Topic), curr.Time, curr.Bid)
 
 	case "makebuffer":
-		if curr.BufferType == "conversation" && !curr.Archived {
+		if curr.BufferType == "conversation" {
 			header := fmt.Sprintf("Chatting since: %s", unixtimeToDate(curr.Created))
-			e.Window.AddChannel(curr.Name, header, curr.Cid, []string{})
+			e.Window.AddChannel(curr.Name, header, curr.Cid, curr.Bid, []string{})
 		}
 
 	case "buffer_me_msg":
-		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time)
+		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time, curr.Bid)
 
 	case "quit":
 		if !backlogEvent {
-			e.Window.RemoveUser(curr.Chan, curr.Nick)
+			e.Window.RemoveUser(curr.Chan, curr.Nick, curr.Bid)
 		}
-		e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg, curr.Time)
+		e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg, curr.Time, curr.Bid)
 	default:
 		//fmt.Printf("Event: %s\n", curr.Type)
 		return

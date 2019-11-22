@@ -38,11 +38,6 @@ func (b *activityBar) updateActivityBar() {
 		return list[i].lastActivity.After(list[j].lastActivity)
 	})
 
-	//reduced := []activityBuffer{}
-	//if len(list) >= 5 {
-	//	reduced = list[0:5]
-	//}
-
 	b.bar.SetText(generateBar(list))
 }
 
