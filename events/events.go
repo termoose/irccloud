@@ -67,6 +67,8 @@ func (e *eventHandler) handleBacklog(url string) {
 		e.handle(event, true)
 	}
 
+	e.Window.Redraw()
+
 	// Remove splash art when backlog has been parsed
 	//e.Window.HideSplash()
 }
@@ -97,7 +99,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 		}
 
 	case "buffer_msg":
-		e.Window.Activity.RegisterActivity(curr.Chan)
+		e.Window.Activity.RegisterActivity(curr.Chan, e.Window)
 		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time)
 
 	case "joined_channel":
@@ -135,6 +137,12 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	default:
 		//fmt.Printf("Event: %s\n", curr.Type)
 		return
+	}
+
+	// We only redraw per event if it's not a backlog event to speed
+	// up app start time
+	if !backlogEvent {
+		e.Window.Redraw()
 	}
 }
 

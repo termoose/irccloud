@@ -22,21 +22,21 @@ func (v *View) getUserIndex(channel, name string) (int, *channel, error) {
 }
 
 func (v *View) AddUser(channel, nick string) {
-	_, c := v.getChannel(channel)
+	v.app.QueueUpdate(func() {
+		_, c := v.getChannel(channel)
 
-	if c != nil {
-		v.app.QueueUpdateDraw(func() {
+		if c != nil {
 			c.users.AddItem(nick, nick, 0, nil)
-		})
-	}
+		}
+	})
 }
 
 func (v *View) RemoveUser(channel, nick string) {
-	index, c, err := v.getUserIndex(channel, nick)
-	
-	if err == nil {
-		v.app.QueueUpdateDraw(func() {
+	v.app.QueueUpdate(func() {
+		index, c, err := v.getUserIndex(channel, nick)
+
+		if err == nil {
 			c.users.RemoveItem(index)
-		})
-	}
+		}
+	})
 }
