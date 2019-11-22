@@ -42,6 +42,7 @@ Probably soon
 - ~Properly quit on Control+C so it doesn't mess up the terminal~
 - ~New query window opened for new private messages~
 - ~Show latest active channels, sorted list of oldest to newest activity~
+- Don't quit when we lose websocket connection, display "Reconnecting" dialogue and retry until Ctrl+C
 - Create a loading bar based on `numbuffers` in `oob_include`
 - Make auto-completion on nick names in the current channel buffer
 - Add list of trigger names to config, include own nick by default?
@@ -54,5 +55,5 @@ Probably soon
 - Get and show fancy ANSI splash art, BitchX style!
 - Should we handle multiple servers? Does irccloud do this? How? (it kinda works)
 - Add support for IRCCloud file upload
-- Get image preview in terminal, ascii-render fallback in supported terminal
+- Get image preview in terminal, ascii-render fallback in unsupported terminal
 - Support IRCCloud's pastebin service, query users with very large text inputs if they want to use pastebin service
