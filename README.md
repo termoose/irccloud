@@ -41,9 +41,11 @@ Probably soon
 - ~Make sure channel join opens a new buffer~
 - ~Properly quit on Control+C so it doesn't mess up the terminal~
 - ~New query window opened for new private messages~
-- Add operator/voice mark next to usernames
-- Show latest active channels, sorted list of oldest to newest activity
+- ~Show latest active channels, sorted list of oldest to newest activity
 - Create a loading bar based on `numbuffers` in `oob_include`
+- Make auto-completion on nick names in the current channel buffer
+- Add list of trigger names to config, include own nick by default?
+- Special highlight for channels with trigger events in event bar
 - ~Show timestamps on chat messages~
 - ~Support nick change messages~
 - ~Show non-message data in chat like join/leave events~
@@ -51,3 +53,6 @@ Probably soon
 - Show operator/voice status in channel member list
 - Get and show fancy ANSI splash art, BitchX style!
 - Should we handle multiple servers? Does irccloud do this? How? (it kinda works)
+- Add support for IRCCloud file upload
+- Get image preview in terminal, ascii-render fallback in supported terminal
+- Support IRCCloud's pastebin service, query users with very large text inputs if they want to use pastebin service
