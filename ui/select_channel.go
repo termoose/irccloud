@@ -28,11 +28,11 @@ func (v *View) showChannelSelector() {
 
 			input.SetDoneFunc(func(key tcell.Key) {
 				if len(results) > 0 && key == tcell.KeyEnter {
-					_, selected := v.getChannel(input.GetText())
+					_, selected := v.getChannelByName(input.GetText())
 					if selected != nil {
 						v.gotoPage(selected)
 					} else {
-						_, first_pick := v.getChannel(resultStrs[0])
+						_, first_pick := v.getChannelByName(resultStrs[0])
 						v.gotoPage(first_pick)
 					}
 				}

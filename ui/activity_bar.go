@@ -38,12 +38,7 @@ func (b *activityBar) updateActivityBar() {
 		return list[i].lastActivity.After(list[j].lastActivity)
 	})
 
-	reduced := []activityBuffer{}
-	if len(list) >= 5 {
-		reduced = list[0:5]
-	}
-
-	b.bar.SetText(generateBar(reduced))
+	b.bar.SetText(generateBar(list))
 }
 
 func bufferToBarElement(buffer activityBuffer) string {
@@ -59,11 +54,13 @@ func generateBar(buffers []activityBuffer) string {
 	return result
 }
 
-func (b *activityBar) RegisterActivity(buffer string) {
-	b.buffers[buffer] = activityBuffer{
-		displayName:  buffer,
-		lastActivity: time.Now(),
-	}
+func (b *activityBar) RegisterActivity(buffer string, view *View) {
+	view.app.QueueUpdate(func() {
+		b.buffers[buffer] = activityBuffer{
+			displayName:  buffer,
+			lastActivity: time.Now(),
+		}
 
-	b.updateActivityBar()
+		b.updateActivityBar()
+	})
 }

@@ -78,6 +78,10 @@ func (v *View) Stop() {
 	v.app.Stop()
 }
 
+func (v *View) Redraw() {
+	v.app.Draw()
+}
+
 func (v *View) sendToBuffer(cid int, channel, message string) {
 	v.websocket.SendMessage(cid, channel, message)
 }
