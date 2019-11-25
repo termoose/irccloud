@@ -59,7 +59,7 @@ func (v *View) AddBufferMsg(channel, from, msg string, time int64) {
 
 	if c != nil {
 		ts := getTimestamp(time)
-		line := fmt.Sprintf("[-:-:d]%s[-:-:-] <[-:-:b]%s[-:-:-]> %s", ts, from, msg)
+		line := fmt.Sprintf("[-:-:d]%s[-:-:-] <[-:-:b]%s[-:-:-]> %s", ts, tview.Escape(from), tview.Escape(msg))
 		v.writeToBuffer(line, c)
 	}
 }
