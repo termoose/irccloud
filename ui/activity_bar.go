@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"errors"
 	"fmt"
 	_ "github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -16,6 +17,7 @@ type activityBuffer struct {
 type activityBar struct {
 	bar     *tview.TextView
 	buffers map[string]activityBuffer
+	sorted  []activityBuffer
 }
 
 func NewActivityBar() *activityBar {
@@ -38,7 +40,17 @@ func (b *activityBar) updateActivityBar() {
 		return list[i].lastActivity.After(list[j].lastActivity)
 	})
 
+	b.sorted = list
+
 	b.bar.SetText(generateBar(list))
+}
+
+func (b *activityBar) GetLatestActiveChannel() (string, error) {
+	if len(b.sorted) == 0 {
+		return "", errors.New("No channels!")
+	}
+
+	return b.sorted[0].displayName, nil
 }
 
 func bufferToBarElement(buffer activityBuffer) string {

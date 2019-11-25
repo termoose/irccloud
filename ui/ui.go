@@ -52,6 +52,15 @@ func (v *View) Start() {
 			}
 		}
 
+		if event.Key() == tcell.KeyCtrlB {
+			lastActive, err := v.Activity.GetLatestActiveChannel()
+
+			if err == nil {
+				_, channel := v.getChannelByName(lastActive)
+				v.gotoPage(channel)
+			}
+		}
+
 		return event
 	})
 
