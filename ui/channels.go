@@ -104,7 +104,6 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 		newChan.layout.AddItem(newChan.info, 0, 0, 1, 2, 0, 0, false)
 
 		v.pages.AddAndSwitchToPage(name, newChan.layout, true)
-
 		v.channels = append(v.channels, newChan)
 
 		v.app.SetFocus(newChan.input)

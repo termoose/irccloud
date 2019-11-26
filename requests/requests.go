@@ -10,16 +10,16 @@ import (
 	"time"
 )
 
-const formtoken_url = "https://www.irccloud.com/chat/auth-formtoken"
-const session_url = "https://www.irccloud.com/chat/login"
+const formtokenUrl = "https://www.irccloud.com/chat/auth-formtoken"
+const sessionUrl = "https://www.irccloud.com/chat/login"
 
-type session_reply struct {
+type sessionReply struct {
 	Success bool
 	Session string
 	Uid     uint32
 }
 
-type formtoken_reply struct {
+type formtokenReply struct {
 	Id      uint32
 	Success bool
 	Token   string
@@ -44,22 +44,22 @@ func GetBacklog(token, endpoint string) *http.Response {
 }
 
 func GetSessionToken(user, pass string) string {
-	http_client := &http.Client{
+	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 
-	formToken := getFormtoken(http_client)
+	formToken := getFormtoken(httpClient)
 
 	form := url.Values{}
 	form.Add("token", formToken)
 	form.Add("email", user)
 	form.Add("password", pass)
 
-	http_request, _ := http.NewRequest("POST", session_url, strings.NewReader(form.Encode()))
-	http_request.Header.Add("X-Auth-FormToken", formToken)
-	http_request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	httpRequest, _ := http.NewRequest("POST", sessionUrl, strings.NewReader(form.Encode()))
+	httpRequest.Header.Add("X-Auth-FormToken", formToken)
+	httpRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := http_client.Do(http_request)
+	resp, err := httpClient.Do(httpRequest)
 	defer resp.Body.Close()
 
 	if err != nil {
@@ -71,7 +71,7 @@ func GetSessionToken(user, pass string) string {
 
 func parseSession(response *http.Response) string {
 	decoder := json.NewDecoder(response.Body)
-	rep := &session_reply{}
+	rep := &sessionReply{}
 	err := decoder.Decode(&rep)
 
 	if err != nil {
@@ -86,13 +86,13 @@ func parseSession(response *http.Response) string {
 }
 
 func getFormtoken(client *http.Client) string {
-	http_client := &http.Client{
+	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 
-	http_request, _ := http.NewRequest("POST", formtoken_url, nil)
-	http_request.Header.Add("Content-Length", "0")
-	resp, _ := http_client.Do(http_request)
+	httpRequest, _ := http.NewRequest("POST", formtokenUrl, nil)
+	httpRequest.Header.Add("Content-Length", "0")
+	resp, _ := httpClient.Do(httpRequest)
 	defer resp.Body.Close()
 
 	return parseToken(resp)
@@ -100,7 +100,7 @@ func getFormtoken(client *http.Client) string {
 
 func parseToken(response *http.Response) string {
 	decoder := json.NewDecoder(response.Body)
-	rep := &formtoken_reply{}
+	rep := &formtokenReply{}
 	err := decoder.Decode(&rep)
 
 	if err != nil {

@@ -6,6 +6,18 @@ import (
 	"github.com/sahilm/fuzzy"
 )
 
+func (v *View) inputDone(key tcell.Key, resultStrs []string, input *tview.InputField) {
+	if len(resultStrs) > 0 && key == tcell.KeyEnter {
+		_, selected := v.getChannelByName(input.GetText())
+		if selected != nil {
+			v.gotoPage(selected)
+		} else {
+			_, first_pick := v.getChannelByName(resultStrs[0])
+			v.gotoPage(first_pick)
+		}
+	}
+}
+
 func (v *View) showChannelSelector() {
 	input := tview.NewInputField().
 		SetPlaceholder("Select channel").
@@ -20,22 +32,17 @@ func (v *View) showChannelSelector() {
 				resultStrs[i] = v.channels[r.Index].name
 			}
 
-			// If there's a unique match we switch immediately?
-			if len(results) == 1 {
-				//_, top_channel := v.getChannel(resultStrs[0])
-				//v.gotoPage(top_channel)
+			// If we don't have any results we go to the channel
+			// with most recent activity
+			if len(resultStrs) == 0 {
+				last, err := v.Activity.GetLatestActiveChannel()
+				if err == nil {
+					resultStrs = append(resultStrs, last)
+				}
 			}
 
 			input.SetDoneFunc(func(key tcell.Key) {
-				if len(results) > 0 && key == tcell.KeyEnter {
-					_, selected := v.getChannelByName(input.GetText())
-					if selected != nil {
-						v.gotoPage(selected)
-					} else {
-						_, first_pick := v.getChannelByName(resultStrs[0])
-						v.gotoPage(first_pick)
-					}
-				}
+				v.inputDone(key, resultStrs, input)
 			})
 
 			return resultStrs
