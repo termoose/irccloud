@@ -34,9 +34,7 @@ func NewActivityBar() *activityBar {
 func (b *activityBar) updateActivityBar() {
 	list := []activityBuffer{}
 	for _, b := range b.buffers {
-		if !b.visited {
-			list = append(list, b)
-		}
+		list = append(list, b)
 	}
 
 	sort.SliceStable(list, func(i, j int) bool {
@@ -52,10 +50,18 @@ func bufferToBarElement(buffer activityBuffer) string {
 	return fmt.Sprintf("[-:blueviolet:-]%s[-:-:-] ", buffer.displayName)
 }
 
+func bufferToVisitedBarElement(buffer activityBuffer) string {
+	return fmt.Sprintf("[-:grey:-]%s[-:-:-] ", buffer.displayName)
+}
+
 func generateBar(buffers []activityBuffer) string {
 	var result string
 	for _, b := range buffers {
-		result += bufferToBarElement(b)
+		if !b.visited {
+			result += bufferToBarElement(b)
+		} else {
+			result += bufferToVisitedBarElement(b)
+		}
 	}
 
 	return result
@@ -67,6 +73,11 @@ func (b *activityBar) MarkAsVisited(buffer string, view *View) {
 
 		if ok {
 			elem.visited = true
+
+			// If you have buffers open with activity from 34 years ago
+			// then this is going to look weird! Not sure of a better way
+			// to keep the order than a translation down memory lane
+			elem.lastActivity = elem.lastActivity.AddDate(-34, 0, 0)
 
 			// Assign the value back to the map
 			b.buffers[buffer] = elem
