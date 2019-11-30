@@ -57,7 +57,10 @@ func (v *View) Start() {
 
 			if err == nil {
 				_, channel := v.getChannelByName(lastActive)
-				v.gotoPage(channel)
+
+				if channel != nil {
+					v.gotoPage(channel)
+				}
 			}
 		}
 

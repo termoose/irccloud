@@ -13,7 +13,10 @@ func (v *View) inputDone(key tcell.Key, resultStrs []string, input *tview.InputF
 			v.gotoPage(selected)
 		} else {
 			_, first_pick := v.getChannelByName(resultStrs[0])
-			v.gotoPage(first_pick)
+
+			if first_pick != nil {
+				v.gotoPage(first_pick)
+			}
 		}
 	}
 }
@@ -57,6 +60,7 @@ func (v *View) hideChannelSelector() {
 }
 
 func (v *View) gotoPage(c *channel) {
+	v.Activity.MarkAsVisited(c.name, v)
 	v.hideChannelSelector()
 	v.pages.SwitchToPage(c.name)
 	v.app.SetFocus(c.input)

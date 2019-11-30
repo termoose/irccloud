@@ -5,13 +5,14 @@ import (
 	"fmt"
 	_ "github.com/gdamore/tcell"
 	"github.com/rivo/tview"
-	"time"
 	"sort"
+	"time"
 )
 
 type activityBuffer struct {
 	displayName  string
 	lastActivity time.Time
+	visited      bool
 }
 
 type activityBar struct {
@@ -33,7 +34,9 @@ func NewActivityBar() *activityBar {
 func (b *activityBar) updateActivityBar() {
 	list := []activityBuffer{}
 	for _, b := range b.buffers {
-		list = append(list, b)
+		if !b.visited {
+			list = append(list, b)
+		}
 	}
 
 	sort.SliceStable(list, func(i, j int) bool {
@@ -43,14 +46,6 @@ func (b *activityBar) updateActivityBar() {
 	b.sorted = list
 
 	b.bar.SetText(generateBar(list))
-}
-
-func (b *activityBar) GetLatestActiveChannel() (string, error) {
-	if len(b.sorted) == 0 {
-		return "", errors.New("No channels!")
-	}
-
-	return b.sorted[0].displayName, nil
 }
 
 func bufferToBarElement(buffer activityBuffer) string {
@@ -66,11 +61,35 @@ func generateBar(buffers []activityBuffer) string {
 	return result
 }
 
+func (b *activityBar) MarkAsVisited(buffer string, view *View) {
+	view.app.QueueUpdateDraw(func() {
+		elem, ok := b.buffers[buffer]
+
+		if ok {
+			elem.visited = true
+
+			// Assign the value back to the map
+			b.buffers[buffer] = elem
+		}
+
+		b.updateActivityBar()
+	})
+}
+
+func (b *activityBar) GetLatestActiveChannel() (string, error) {
+	if len(b.sorted) == 0 {
+		return "", errors.New("No channels!")
+	}
+
+	return b.sorted[0].displayName, nil
+}
+
 func (b *activityBar) RegisterActivity(buffer string, view *View) {
 	view.app.QueueUpdate(func() {
 		b.buffers[buffer] = activityBuffer{
 			displayName:  buffer,
 			lastActivity: time.Now(),
+			visited:      false,
 		}
 
 		b.updateActivityBar()
