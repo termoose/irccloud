@@ -15,6 +15,21 @@ For all of this to work you need an IRCCloud account. If you're not familiar wit
 - <kbd>Ctrl</kbd>+<kbd>w</kbd>: Delete the last word before the cursor
 - <kbd>Ctrl</kbd>+<kbd>u</kbd>: Delete the entire line
 
+## Configuration
+
+A configuration file is automatically generated if you don't already have one, typically the first time you start the client.
+The file is created in `~/.config/irccloud`. Add the username and password you use for IRCCloud. You can also add trigger
+words (like your own nick) to get special notifications on channels where those trigger words are mentioned.
+
+```yaml
+username: your_username_here/email
+password: secret_password_here
+triggers:
+  - cakes
+  - my_own_nick
+  - cat.gif
+```
+
 ## Installing
 
 ```bash
