@@ -26,15 +26,13 @@ func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
 		AddItem(nil, 0, 1, false)
 }
 
-func NewView(socket *requests.Connection) *View {
+func NewView(socket *requests.Connection, triggerWords []string) *View {
 	view := &View{
 		pages:     tview.NewPages(),
-		layout:    tview.NewGrid().
-			SetRows(1, 0).
-			SetColumns(0),
+		layout:    newGrid(),
 		basePages: tview.NewPages(),
 		websocket: socket,
-		Activity:  NewActivityBar(),
+		Activity:  NewActivityBar(triggerWords),
 	}
 
 	return view
@@ -120,6 +118,12 @@ func newANSIView() *tview.TextView {
 		SetWrap(false).
 		//	SetText(art)
 		SetText(tview.TranslateANSI(art))
+}
+
+func newGrid() *tview.Grid {
+	return tview.NewGrid().
+		SetRows(1, 0).
+		SetColumns(0)
 }
 
 func newTextView(text string) *tview.TextView {

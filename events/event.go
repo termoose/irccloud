@@ -2,8 +2,6 @@ package events
 
 import (
 	"encoding/json"
-	"github.com/termoose/irccloud/requests"
-	"github.com/termoose/irccloud/ui"
 	"log"
 	"net/http"
 	"sort"
@@ -22,7 +20,7 @@ type topic struct {
 	Text string `json:"text"`
 }
 
-type oob_include struct {
+type oobInclude struct {
 	Url string
 }
 
@@ -81,31 +79,6 @@ func getTopicName(e json.RawMessage) string {
 	}
 
 	return dst.Text
-}
-
-func InitBacklog(token, url string, window *ui.View) {
-	backlog := requests.GetBacklog(token, url)
-	backlogData := parseBacklog(backlog)
-
-	// First we initialize all channels
-	for _, event := range backlogData {
-		if event.Type == "channel_init" {
-			user_strings := []string{}
-			for _, user_string := range event.Members {
-				user_strings = append(user_strings, user_string.Nick)
-			}
-
-			topic := getTopicName(event.Topic)
-			window.AddChannel(event.Chan, topic, event.Cid, event.Bid, user_strings)
-		}
-	}
-
-	// Then we fill them with the message backlog
-	for _, event := range backlogData {
-		if event.Type == "buffer_msg" {
-			window.AddBufferMsg(event.Chan, event.From, event.Msg, event.Time, event.Bid)
-		}
-	}
 }
 
 func parseBacklog(backlog *http.Response) []eventData {

@@ -10,8 +10,9 @@ import (
 )
 
 type Confdata struct {
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+	Username string   `yaml:"username"`
+	Password string   `yaml:"password"`
+	Triggers []string `yaml:"triggers"`
 }
 
 func Parse() Confdata {
@@ -41,6 +42,7 @@ func writeDummyConfig(filename string) Confdata {
 	dummy := Confdata{
 		Username: "your_username_here",
 		Password: "secret_password_here",
+		Triggers: []string{},
 	}
 	content, _ := yaml.Marshal(&dummy)
 	if err := ioutil.WriteFile(filename, content, 0600); err != nil {

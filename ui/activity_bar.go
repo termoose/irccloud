@@ -6,6 +6,7 @@ import (
 	_ "github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -13,21 +14,24 @@ type activityBuffer struct {
 	displayName  string
 	lastActivity time.Time
 	visited      bool
+	triggerWord  bool
 }
 
 type activityBar struct {
-	bar     *tview.TextView
-	buffers map[string]activityBuffer
-	sorted  []activityBuffer
+	bar          *tview.TextView
+	buffers      map[string]activityBuffer
+	sorted       []activityBuffer
+	triggerWords []string
 }
 
-func NewActivityBar() *activityBar {
+func NewActivityBar(triggers []string) *activityBar {
 	return &activityBar{
 		bar: tview.NewTextView().
 			SetDynamicColors(true).
 			SetWrap(false).
 			SetScrollable(false),
 		buffers: make(map[string]activityBuffer),
+		triggerWords: triggers,
 	}
 }
 
@@ -47,6 +51,10 @@ func (b *activityBar) updateActivityBar() {
 }
 
 func bufferToBarElement(buffer activityBuffer) string {
+	if buffer.triggerWord {
+		return fmt.Sprintf("[white:blueviolet:b]%s[-:-:-] ", buffer.displayName)
+	}
+
 	return fmt.Sprintf("[-:blueviolet:-]%s[-:-:-] ", buffer.displayName)
 }
 
@@ -65,6 +73,16 @@ func generateBar(buffers []activityBuffer) string {
 	}
 
 	return result
+}
+
+func (b *activityBar) hasTriggerWord(line string) bool {
+	for _, word := range b.triggerWords {
+		if strings.Contains(line, word) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (b *activityBar) MarkAsVisited(buffer string, view *View) {
@@ -95,12 +113,15 @@ func (b *activityBar) GetLatestActiveChannel() (string, error) {
 	return b.sorted[0].displayName, nil
 }
 
-func (b *activityBar) RegisterActivity(buffer string, view *View) {
+func (b *activityBar) RegisterActivity(buffer, msg string, view *View) {
 	view.app.QueueUpdate(func() {
+		trigger := b.hasTriggerWord(msg)
+
 		b.buffers[buffer] = activityBuffer{
 			displayName:  buffer,
 			lastActivity: time.Now(),
 			visited:      false,
+			triggerWord:  trigger,
 		}
 
 		b.updateActivityBar()

@@ -13,22 +13,22 @@ func main() {
 
 	session := requests.GetSessionToken(conf.Username, conf.Password)
 
-	ws_conn := requests.NewConnection(session)
-	view := ui.NewView(ws_conn)
+	wsConn := requests.NewConnection(session)
+	view := ui.NewView(wsConn, conf.Triggers)
 	defer view.Stop()
 
-	event_handler := events.NewHandler(session, view)
+	eventHandler := events.NewHandler(session, view)
 
 	go func() {
 		for {
-			msg, err := ws_conn.ReadMessage()
+			msg, err := wsConn.ReadMessage()
 
 			if err != nil {
 				view.Stop()
 				log.Fatal(err)
 			}
 
-			event_handler.Enqueue(msg)
+			eventHandler.Enqueue(msg)
 		}
 	}()
 

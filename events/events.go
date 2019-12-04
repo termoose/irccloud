@@ -76,7 +76,7 @@ func (e *eventHandler) handleBacklog(url string) {
 func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	switch curr.Type {
 	case "oob_include":
-		oob_data := &oob_include{}
+		oob_data := &oobInclude{}
 		err := json.Unmarshal(curr.Data, &oob_data)
 
 		if err == nil {
@@ -100,7 +100,7 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 
 	case "buffer_msg":
 		if e.Window.HasChannel(curr.Chan) {
-			e.Window.Activity.RegisterActivity(curr.Chan, e.Window)
+			e.Window.Activity.RegisterActivity(curr.Chan, curr.Msg, e.Window)
 			e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time, curr.Bid)
 		}
 
