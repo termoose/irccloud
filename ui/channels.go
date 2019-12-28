@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"strings"
 )
 
 type channel struct {
@@ -89,6 +90,22 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 		if key == tcell.KeyEnter {
 			v.sendToBuffer(cid, name, newChan.input.GetText())
 			newChan.input.SetText("")
+		}
+
+		if key == tcell.KeyTab {
+			currText := newChan.input.GetText()
+			words := strings.Split(currText, " ")
+
+			if len(words) > 0 {
+				lastWord := words[len(words) - 1]
+				foundUsersIdxs := newChan.users.FindItems(lastWord, lastWord, false, true)
+
+				if len(foundUsersIdxs) > 0 {
+					foundUser, _ := newChan.users.GetItemText(foundUsersIdxs[0])
+					newInput := strings.Join(append(words[:len(words) - 1], foundUser), " ")
+					newChan.input.SetText(newInput)
+				}
+			}
 		}
 	})
 
