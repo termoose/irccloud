@@ -8,6 +8,7 @@ For all of this to work you need an IRCCloud account. If you're not familiar wit
 ## Navigation
 
 - <kbd>Ctrl</kbd>+<kbd>Space</kbd>: Select channel
+- <kdb>Tab</kdb>: Auto-complete nicks
 - <kbd>Ctrl</kbd>+<kbd>b</kbd>: Switch to channel with most recent activity
 - <kbd>Home</kbd>, <kbd>Ctrl</kbd>+<kbd>a</kbd>: Move to the beginning of the line
 - <kbd>End</kbd>, <kbd>Ctrl</kbd>+<kbd>e</kbd>: Move to the end of the line
@@ -20,10 +21,14 @@ For all of this to work you need an IRCCloud account. If you're not familiar wit
 A configuration file is automatically generated if you don't already have one, typically the first time you start the client.
 The file is created in `~/.config/irccloud`. Add the username and password you use for IRCCloud. You can also add trigger
 words (like your own nick) to get special notifications on channels where those trigger words are mentioned.
+There's also a `last_chan` field which will be the first channel you see when you start your client,
+this is set to the channel you were viewing the last time you closed the client. This way you always get
+back to where you last left off!
 
 ```yaml
 username: your_username_here/email
 password: secret_password_here
+last_chan: '#gonuts'
 triggers:
   - cakes
   - my_own_nick
