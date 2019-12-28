@@ -14,8 +14,13 @@ func main() {
 	session := requests.GetSessionToken(conf.Username, conf.Password)
 
 	wsConn := requests.NewConnection(session)
-	view := ui.NewView(wsConn, conf.Triggers)
-	defer view.Stop()
+	view := ui.NewView(wsConn, conf.Triggers, conf.LastChan)
+
+	defer func() {
+		current := view.GetCurrentChannel()
+		config.WriteLatestChannel(conf, current)
+		view.Stop()
+	}()
 
 	eventHandler := events.NewHandler(session, view)
 

@@ -24,8 +24,8 @@ func NewHandler(token string, w *ui.View) *eventHandler {
 
 	// Start consumer thread
 	go func() {
-		for curr_event := range handler.Queue {
-			handler.handle(curr_event, false)
+		for currEvent := range handler.Queue {
+			handler.handle(currEvent, false)
 		}
 	}()
 
@@ -51,22 +51,24 @@ func (e *eventHandler) handleBacklog(url string) {
 	// First we initialize all channels
 	for _, event := range backlogData {
 		if event.Type == "channel_init" {
-			user_strings := []string{}
-			for _, user_string := range event.Members {
-				user_strings = append(user_strings, user_string.Nick)
+			userStr := []string{}
+			for _, userString := range event.Members {
+				userStr = append(userStr, userString.Nick)
 			}
 
 			topic := getTopicName(event.Topic)
-			e.Window.AddChannel(event.Chan, topic, event.Cid, event.Bid, user_strings)
+			e.Window.AddChannel(event.Chan, topic, event.Cid, event.Bid, userStr)
 		}
 	}
 
 	// Then we fill them with the message backlog, should we send these events
-	// to the event queue to have them arrive before live events
+	// to the event queue to have them arrive before live events?
 	for _, event := range backlogData {
 		e.handle(event, true)
 	}
 
+	// Go to the last visited channel if it exists
+	e.Window.SetLatestChannel()
 	e.Window.Redraw()
 
 	// Remove splash art when backlog has been parsed
@@ -76,21 +78,21 @@ func (e *eventHandler) handleBacklog(url string) {
 func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	switch curr.Type {
 	case "oob_include":
-		oob_data := &oobInclude{}
-		err := json.Unmarshal(curr.Data, &oob_data)
+		oobData := &oobInclude{}
+		err := json.Unmarshal(curr.Data, &oobData)
 
 		if err == nil {
-			e.handleBacklog(oob_data.Url)
+			e.handleBacklog(oobData.Url)
 		}
 
 	case "channel_init":
 		if !backlogEvent {
-			user_strings := []string{}
-			for _, user_string := range curr.Members {
-				user_strings = append(user_strings, user_string.Nick)
+			userStrings := []string{}
+			for _, userString := range curr.Members {
+				userStrings = append(userStrings, userString.Nick)
 			}
 			topic := getTopicName(curr.Topic)
-			e.Window.AddChannel(curr.Chan, topic, curr.Cid, curr.Bid, user_strings)
+			e.Window.AddChannel(curr.Chan, topic, curr.Cid, curr.Bid, userStrings)
 		}
 
 	case "you_parted_channel":

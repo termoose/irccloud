@@ -14,6 +14,7 @@ type View struct {
 	channels  channelList
 	websocket *requests.Connection
 	Activity  *activityBar
+	lastChan  string
 }
 
 func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
@@ -26,16 +27,22 @@ func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
 		AddItem(nil, 0, 1, false)
 }
 
-func NewView(socket *requests.Connection, triggerWords []string) *View {
+func NewView(socket *requests.Connection, triggerWords []string, lastChannel string) *View {
 	view := &View{
 		pages:     tview.NewPages(),
 		layout:    newGrid(),
 		basePages: tview.NewPages(),
 		websocket: socket,
 		Activity:  NewActivityBar(triggerWords),
+		lastChan:  lastChannel,
 	}
 
 	return view
+}
+
+func (v *View) GetCurrentChannel() string {
+	name, _ := v.pages.GetFrontPage()
+	return name
 }
 
 func (v *View) Start() {
@@ -86,6 +93,16 @@ func (v *View) HideSplash() {
 
 func (v *View) Stop() {
 	v.app.Stop()
+}
+
+func (v *View) SetLatestChannel() {
+	_, selected := v.getChannelByName(v.lastChan)
+
+	if selected != nil {
+		v.Activity.MarkAsVisited(selected.name, v)
+		v.pages.SwitchToPage(selected.name)
+		v.app.SetFocus(selected.input)
+	}
 }
 
 func (v *View) Redraw() {
