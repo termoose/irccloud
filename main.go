@@ -30,7 +30,9 @@ func main() {
 
 			if err != nil {
 				view.Stop()
-				log.Fatal(err)
+				log.Print(err)
+
+				return
 			}
 
 			eventHandler.Enqueue(msg)
