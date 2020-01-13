@@ -57,6 +57,16 @@ func (v *View) showChannelSelector() {
 
 func (v *View) hideChannelSelector() {
 	v.basePages.RemovePage("select_channel")
+
+	page, primitive := v.pages.GetFrontPage()
+
+	if primitive != nil {
+		_, channel := v.getChannelByName(page)
+
+		if channel != nil {
+			v.app.SetFocus(channel.input)
+		}
+	}
 }
 
 func (v *View) gotoPage(c *channel) {
