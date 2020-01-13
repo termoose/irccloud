@@ -51,7 +51,9 @@ On the first run a config file will be generated for you in `~/.config/irccloud`
 
 ### Homebrew
 
-Soon
+```bash
+brew install termoose/tap/irccloud-cli
+```
 
 ### Flatpak (Linux)
 
