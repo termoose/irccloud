@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"github.com/sahilm/fuzzy"
 	"strings"
 )
 
@@ -16,6 +17,8 @@ type channel struct {
 	info   *tview.TextView
 	cid    int
 	bid    int
+	msgs   chan string
+	buffer []byte
 }
 
 type channelList []channel
@@ -30,6 +33,18 @@ func (c channelList) Len() int {
 
 func headerString(name, topic string) string {
 	return fmt.Sprintf("[gold:-:b]%s[-:-:-]: [lime:-:-]%s[-:-:-]", name, topic)
+}
+
+func (c *channel) SendToChannel(line string) {
+	c.msgs <- "\n" + line
+}
+
+// FIXME: only call this in a separate goroutine, where we
+// read from a common buffer so support scrolling
+// But set everything from `buffer` with one Write()
+func (c *channel) WriteToChannel(line string) {
+	_, _ = c.chat.Write([]byte("\n" + line))
+	c.chat.ScrollToEnd()
 }
 
 func (v *View) getChannelByName(name string) (int, *channel) {
@@ -76,14 +91,27 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 			SetRows(1, 0, 1).
 			SetColumns(20, 0, 20).
 			SetBorders(false),
-		name:  name,
-		chat:  newTextView(""),
-		users: newListView(),
-		input: newTextInput(),
-		info:  newTextView(headerString(name, topic)),
-		cid:   cid,
-		bid:   bid,
+		name:   name,
+		chat:   newTextView(""),
+		users:  newListView(),
+		input:  newTextInput(),
+		info:   newTextView(headerString(name, topic)),
+		cid:    cid,
+		bid:    bid,
+		buffer: make([]byte, 300),
+		msgs:   make(chan string, 10),
 	}
+
+	go func() {
+		for msg := range newChan.msgs {
+			msgBytes := []byte(msg)
+			newChan.buffer = append(newChan.buffer, msgBytes...)
+
+			newChan.chat.Clear()
+			_, _ = newChan.chat.Write(newChan.buffer)
+			newChan.chat.ScrollToEnd()
+		}
+	}()
 
 	// Set callback for handling message sending
 	newChan.input.SetDoneFunc(func(key tcell.Key) {
@@ -101,9 +129,22 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 				foundUsersIdxs := newChan.users.FindItems(lastWord, lastWord, false, true)
 
 				if len(foundUsersIdxs) > 0 {
-					foundUser, _ := newChan.users.GetItemText(foundUsersIdxs[0])
-					newInput := strings.Join(append(words[:len(words) - 1], foundUser), " ")
-					newChan.input.SetText(newInput)
+					//foundUser, _ := newChan.users.GetItemText(foundUsersIdxs[0])
+
+					var userList []string
+					for i, _ := range foundUsersIdxs {
+						foundUser, _ := newChan.users.GetItemText(foundUsersIdxs[i])
+
+						userList = append(userList, foundUser)
+					}
+
+					results := fuzzy.Find(lastWord, userList)
+
+					if len(results) > 0 {
+						result := results[0]
+						newInput := strings.Join(append(words[:len(words)-1], result.Str), " ")
+						newChan.input.SetText(newInput)
+					}
 				}
 			}
 		}

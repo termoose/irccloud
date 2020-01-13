@@ -76,6 +76,7 @@ func (v *View) AddBufferMsg(channel, from, msg string, time int64, bid int) {
 }
 
 func (v *View) writeToBuffer(line string, c *channel) {
-	_, _ = c.chat.Write([]byte("\n" + line))
-	c.chat.ScrollToEnd()
+	c.SendToChannel(line)
+	//_, _ = c.chat.Write([]byte("\n" + line))
+	//c.chat.ScrollToEnd()
 }
