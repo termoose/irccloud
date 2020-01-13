@@ -20,12 +20,11 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
-
 brews:
   -
     name: irccloud-cli
     github:
       owner: termoose
       name: homebrew-tap
-    description: "Text-mode terminal client for IRCCloud."
-    url_template: "http://github.com/termoose/irccloud/releases/{{ .Tag }}/{{ .ArtifactName }}"
+    homepage: https://github.com/termoose/irccloud
+    description: Text-mode terminal client for IRCCloud
