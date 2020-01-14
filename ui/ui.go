@@ -4,17 +4,19 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"github.com/termoose/irccloud/requests"
+	"sync"
 )
 
 type View struct {
-	basePages *tview.Pages
-	pages     *tview.Pages
-	layout    *tview.Grid
-	app       *tview.Application
-	channels  channelList
-	websocket *requests.Connection
-	Activity  *activityBar
-	lastChan  string
+	basePages   *tview.Pages
+	pages       *tview.Pages
+	layout      *tview.Grid
+	app         *tview.Application
+	channels    channelList
+	websocket   *requests.Connection
+	Activity    *activityBar
+	lastChan    string
+	channelLock sync.Mutex
 }
 
 func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
@@ -99,9 +101,11 @@ func (v *View) SetLatestChannel() {
 	_, selected := v.getChannelByName(v.lastChan)
 
 	if selected != nil {
-		v.Activity.MarkAsVisited(selected.name, v)
-		v.pages.SwitchToPage(selected.name)
-		v.app.SetFocus(selected.input)
+		v.app.QueueUpdate(func() {
+			v.Activity.MarkAsVisited(selected.name, v)
+			v.pages.SwitchToPage(selected.name)
+			v.app.SetFocus(selected.input)
+		})
 	}
 }
 

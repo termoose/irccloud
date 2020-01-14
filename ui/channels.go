@@ -48,6 +48,9 @@ func (c *channel) WriteToChannel(line string) {
 }
 
 func (v *View) getChannelByName(name string) (int, *channel) {
+	v.channelLock.Lock()
+	defer v.channelLock.Unlock()
+
 	for i, c := range v.channels {
 		if c.name == name {
 			return i, &v.channels[i]
@@ -162,6 +165,10 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 		newChan.layout.AddItem(newChan.info, 0, 0, 1, 2, 0, 0, false)
 
 		v.pages.AddAndSwitchToPage(name, newChan.layout, true)
+
+		v.channelLock.Lock()
+		defer v.channelLock.Unlock()
+
 		v.channels = append(v.channels, newChan)
 
 		v.app.SetFocus(newChan.input)
@@ -179,5 +186,8 @@ func (v *View) RemoveChannel(name string) {
 	})
 
 	index, _ := v.getChannelByName(name)
+
+	v.channelLock.Lock()
+	defer v.channelLock.Unlock()
 	v.channels = remove(v.channels, index)
 }
