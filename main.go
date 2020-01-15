@@ -11,7 +11,12 @@ import (
 func main() {
 	conf := config.Parse()
 
-	session := requests.GetSessionToken(conf.Username, conf.Password)
+	session, err := requests.GetSessionToken(conf.Username, conf.Password)
+
+	if err != nil {
+		log.Print(err)
+		return
+	}
 
 	wsConn := requests.NewConnection(session)
 	view := ui.NewView(wsConn, conf.Triggers, conf.LastChan)

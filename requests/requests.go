@@ -43,12 +43,16 @@ func GetBacklog(token, endpoint string) *http.Response {
 	return resp
 }
 
-func GetSessionToken(user, pass string) string {
+func GetSessionToken(user, pass string) (string, error) {
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 
-	formToken := getFormtoken(httpClient)
+	formToken, err := getFormtoken(httpClient)
+
+	if err != nil {
+		return "", fmt.Errorf("error getting session token: %v", err)
+	}
 
 	form := url.Values{}
 	form.Add("token", formToken)
@@ -60,13 +64,14 @@ func GetSessionToken(user, pass string) string {
 	httpRequest.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := httpClient.Do(httpRequest)
-	defer resp.Body.Close()
 
 	if err != nil {
-		panic(err)
+		log.Print(err)
+		return "", err
 	}
 
-	return parseSession(resp)
+	defer resp.Body.Close()
+	return parseSession(resp), nil
 }
 
 func parseSession(response *http.Response) string {
@@ -85,27 +90,32 @@ func parseSession(response *http.Response) string {
 	return rep.Session
 }
 
-func getFormtoken(client *http.Client) string {
+func getFormtoken(client *http.Client) (string, error) {
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 
 	httpRequest, _ := http.NewRequest("POST", formtokenUrl, nil)
 	httpRequest.Header.Add("Content-Length", "0")
-	resp, _ := httpClient.Do(httpRequest)
+	resp, err := httpClient.Do(httpRequest)
+
+	if err != nil {
+		return "", fmt.Errorf("error getting form token: %v", err)
+	}
+
 	defer resp.Body.Close()
 
 	return parseToken(resp)
 }
 
-func parseToken(response *http.Response) string {
+func parseToken(response *http.Response) (string, error) {
 	decoder := json.NewDecoder(response.Body)
 	rep := &formtokenReply{}
 	err := decoder.Decode(&rep)
 
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("can't parse token response: %v", err)
 	}
 
-	return rep.Token
+	return rep.Token, nil
 }
