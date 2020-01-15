@@ -1,4 +1,3 @@
-source = ["./irccloud"]
 bundle_id = "com.termoose.irccloud"
 
 sign {
