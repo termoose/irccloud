@@ -26,14 +26,3 @@ brews:
       name: homebrew-tap
     homepage: https://github.com/termoose/irccloud
     description: Text-mode terminal client for IRCCloud
-signs:
-  - signature: "${artifact}.dmg"
-    ids:
-    - foo-macos # here we filter the macos only build id
-    # you'll need to have gon on PATH
-    cmd: gon
-    # you can follow the gon docs to properly create the gon.hcl config file:
-    # https://github.com/mitchellh/gon
-    args:
-    - gon.hcl
-    artifacts: all
