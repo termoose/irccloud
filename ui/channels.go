@@ -39,6 +39,11 @@ func (c *channel) SendToChannel(line string) {
 	c.msgs <- "\n" + line
 }
 
+func (c *channel) Scroll(amount int) {
+	row, column := c.chat.GetScrollOffset()
+	c.chat.ScrollTo(row + amount, column)
+}
+
 func (v *View) getChannelByName(name string) (int, *channel) {
 	v.channelLock.Lock()
 	defer v.channelLock.Unlock()
@@ -53,6 +58,9 @@ func (v *View) getChannelByName(name string) (int, *channel) {
 }
 
 func (v *View) getChannel(name string, bid int) (int, *channel) {
+	v.channelLock.Lock()
+	defer v.channelLock.Unlock()
+
 	for i, c := range v.channels {
 		if c.name == name && c.bid == bid {
 			return i, &v.channels[i]
@@ -99,11 +107,11 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 
 	go func() {
 		for msg := range newChan.msgs {
+			v.channelLock.Lock()
 			msgBytes := []byte(msg)
 
 			newChan.buffer = append(newChan.buffer, msgBytes...)
 
-			v.channelLock.Lock()
 			newChan.chat.Clear()
 			_, _ = newChan.chat.Write(newChan.buffer)
 			newChan.chat.ScrollToEnd()
