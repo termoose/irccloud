@@ -39,14 +39,6 @@ func (c *channel) SendToChannel(line string) {
 	c.msgs <- "\n" + line
 }
 
-// FIXME: only call this in a separate goroutine, where we
-// read from a common buffer so support scrolling
-// But set everything from `buffer` with one Write()
-func (c *channel) WriteToChannel(line string) {
-	_, _ = c.chat.Write([]byte("\n" + line))
-	c.chat.ScrollToEnd()
-}
-
 func (v *View) getChannelByName(name string) (int, *channel) {
 	v.channelLock.Lock()
 	defer v.channelLock.Unlock()
@@ -109,9 +101,9 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 		for msg := range newChan.msgs {
 			msgBytes := []byte(msg)
 
-			v.channelLock.Lock()
 			newChan.buffer = append(newChan.buffer, msgBytes...)
 
+			v.channelLock.Lock()
 			newChan.chat.Clear()
 			_, _ = newChan.chat.Write(newChan.buffer)
 			newChan.chat.ScrollToEnd()
