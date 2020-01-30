@@ -10,6 +10,7 @@ For all of this to work you need an IRCCloud account. If you're not familiar wit
 - <kbd>Ctrl</kbd>+<kbd>Space</kbd>: Select channel
 - <kbd>Tab</kbd>: Auto-complete nicks
 - <kbd>Ctrl</kbd>+<kbd>b</kbd>: Switch to channel with most recent activity
+- <kbd>PgUp</kbd>/<kbd>PgDown</kbd>: Scroll in the channel buffer
 - <kbd>Home</kbd>, <kbd>Ctrl</kbd>+<kbd>a</kbd>: Move to the beginning of the line
 - <kbd>End</kbd>, <kbd>Ctrl</kbd>+<kbd>e</kbd>: Move to the end of the line
 - <kbd>Ctrl</kbd>+<kbd>k</kbd>: Delete from the cursor to the end of the line
