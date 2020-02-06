@@ -117,6 +117,9 @@ func (b *activityBar) MarkAsVisited(buffer string, view *View) {
 }
 
 func (b *activityBar) GetLatestActiveChannel() (string, error) {
+	b.buffersLock.Lock()
+	defer b.buffersLock.Unlock()
+
 	if len(b.sorted) == 0 {
 		return "", errors.New("No channels!")
 	}
