@@ -70,9 +70,6 @@ func (e *eventHandler) handleBacklog(url string) {
 	// Go to the last visited channel if it exists
 	e.Window.SetLatestChannel()
 	e.Window.Redraw()
-
-	// Remove splash art when backlog has been parsed
-	//e.Window.HideSplash()
 }
 
 func (e *eventHandler) handle(curr eventData, backlogEvent bool) {

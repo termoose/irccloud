@@ -41,7 +41,7 @@ func (c *channel) SendToChannel(line string) {
 
 func (c *channel) Scroll(amount int) {
 	row, column := c.chat.GetScrollOffset()
-	c.chat.ScrollTo(row + amount, column)
+	c.chat.ScrollTo(row+amount, column)
 }
 
 func (v *View) getChannelByName(name string) (int, *channel) {
@@ -131,7 +131,7 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 			words := strings.Split(currText, " ")
 
 			if len(words) > 0 {
-				lastWord := words[len(words) - 1]
+				lastWord := words[len(words)-1]
 				foundUsersIdxs := newChan.users.FindItems(lastWord, lastWord, false, true)
 
 				if len(foundUsersIdxs) > 0 {

@@ -32,7 +32,7 @@ func NewActivityBar(triggers []string) *activityBar {
 			SetDynamicColors(true).
 			SetWrap(false).
 			SetScrollable(false),
-		buffers: make(map[string]activityBuffer),
+		buffers:      make(map[string]activityBuffer),
 		triggerWords: triggers,
 	}
 }
@@ -41,7 +41,7 @@ func (b *activityBar) updateActivityBar(view *View) {
 	b.buffersLock.Lock()
 	defer b.buffersLock.Unlock()
 
-	list := []activityBuffer{}
+	var list []activityBuffer
 	for _, b := range b.buffers {
 		list = append(list, b)
 	}

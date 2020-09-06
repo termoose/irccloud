@@ -71,36 +71,32 @@ func GetSessionToken(user, pass string) (string, error) {
 	}
 
 	defer resp.Body.Close()
-	return parseSession(resp), nil
+	return parseSession(resp)
 }
 
-func parseSession(response *http.Response) string {
+func parseSession(response *http.Response) (string, error) {
 	decoder := json.NewDecoder(response.Body)
 	rep := &sessionReply{}
 	err := decoder.Decode(&rep)
 
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("error parsing auth reply: %w", err)
 	}
 
 	if !rep.Success {
-		panic("Incorrect login!")
+		return "", fmt.Errorf("invalid login: %w", err)
 	}
 
-	return rep.Session
+	return rep.Session, nil
 }
 
 func getFormtoken(client *http.Client) (string, error) {
-	httpClient := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
 	httpRequest, _ := http.NewRequest("POST", formtokenUrl, nil)
 	httpRequest.Header.Add("Content-Length", "0")
-	resp, err := httpClient.Do(httpRequest)
+	resp, err := client.Do(httpRequest)
 
 	if err != nil {
-		return "", fmt.Errorf("error getting form token: %v", err)
+		return "", fmt.Errorf("error getting form token: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -114,7 +110,7 @@ func parseToken(response *http.Response) (string, error) {
 	err := decoder.Decode(&rep)
 
 	if err != nil {
-		return "", fmt.Errorf("can't parse token response: %v", err)
+		return "", fmt.Errorf("can't parse token response: %w", err)
 	}
 
 	return rep.Token, nil

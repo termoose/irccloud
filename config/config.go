@@ -9,17 +9,15 @@ import (
 	"path/filepath"
 )
 
-type ConfigData struct {
+type Data struct {
 	Username string   `yaml:"username"`
 	Password string   `yaml:"password"`
 	Triggers []string `yaml:"triggers"`
 	LastChan string   `yaml:"last_chan"`
 }
 
-func Parse() ConfigData {
-	var result ConfigData
-	//currUser, _ := user.Current()
-	//confDir := filepath.Join(currUser.HomeDir, "/.config/irccloud/")
+func Parse() Data {
+	var result Data
 	filename, configDir := getPaths()
 
 	// Don't care if this fails
@@ -45,22 +43,22 @@ func getPaths() (string, string) {
 	return filepath.Join(confDir, "config.yaml"), confDir
 }
 
-func WriteLatestChannel(data ConfigData, latest string) {
+func WriteLatestChannel(data Data, latest string) {
 	data.LastChan = latest
 	filename, _ := getPaths()
 
 	writeConfig(filename, data)
 }
 
-func writeConfig(filename string, data ConfigData) {
+func writeConfig(filename string, data Data) {
 	content, _ := yaml.Marshal(&data)
 	if err := ioutil.WriteFile(filename, content, 0600); err != nil {
 		fmt.Printf("Could not write config to to file %s\n", filename)
 	}
 }
 
-func writeDummyConfig(filename string) ConfigData {
-	dummy := ConfigData{
+func writeDummyConfig(filename string) Data {
+	dummy := Data{
 		Username: "your_username_here",
 		Password: "secret_password_here",
 		Triggers: []string{},
@@ -68,10 +66,5 @@ func writeDummyConfig(filename string) ConfigData {
 	}
 
 	writeConfig(filename, dummy)
-	//content, _ := yaml.Marshal(&dummy)
-	//if err := ioutil.WriteFile(filename, content, 0600); err != nil {
-	//	fmt.Printf("Could not write config to to file %s\n", filename)
-	//}
-
 	return dummy
 }
