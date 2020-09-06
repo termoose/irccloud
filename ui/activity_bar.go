@@ -51,10 +51,7 @@ func (b *activityBar) updateActivityBar(view *View) {
 	})
 
 	b.sorted = list
-
-	view.app.QueueUpdate(func() {
-		b.bar.SetText(generateBar(list))
-	})
+	b.bar.SetText(generateBar(list))
 }
 
 func bufferToBarElement(buffer activityBuffer) string {
@@ -111,9 +108,7 @@ func (b *activityBar) MarkAsVisited(buffer string, view *View) {
 		b.buffersLock.Unlock()
 	}
 
-	view.app.QueueUpdateDraw(func() {
-		b.updateActivityBar(view)
-	})
+	b.updateActivityBar(view)
 }
 
 func (b *activityBar) GetLatestActiveChannel() (string, error) {

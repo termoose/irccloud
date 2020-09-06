@@ -107,15 +107,16 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 
 	go func() {
 		for msg := range newChan.msgs {
-			v.channelLock.Lock()
-			msgBytes := []byte(msg)
+			v.app.QueueUpdate(func() {
+				msgBytes := []byte(msg)
 
-			newChan.buffer = append(newChan.buffer, msgBytes...)
+				newChan.buffer = append(newChan.buffer, msgBytes...)
 
-			newChan.chat.Clear()
-			_, _ = newChan.chat.Write(newChan.buffer)
-			newChan.chat.ScrollToEnd()
-			v.channelLock.Unlock()
+				newChan.chat.Clear()
+				_, _ = newChan.chat.Write(newChan.buffer)
+
+				newChan.chat.ScrollToEnd()
+			})
 		}
 	}()
 
