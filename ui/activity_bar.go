@@ -92,7 +92,6 @@ func (b *activityBar) hasTriggerWord(line string) bool {
 func (b *activityBar) MarkAsVisited(buffer string, view *View) {
 	b.buffersLock.Lock()
 	elem, ok := b.buffers[buffer]
-	b.buffersLock.Unlock()
 
 	if ok {
 		elem.visited = true
@@ -103,10 +102,9 @@ func (b *activityBar) MarkAsVisited(buffer string, view *View) {
 		elem.lastActivity = elem.lastActivity.AddDate(-34, 0, 0)
 
 		// Assign the value back to the map
-		b.buffersLock.Lock()
 		b.buffers[buffer] = elem
-		b.buffersLock.Unlock()
 	}
+	b.buffersLock.Unlock()
 
 	b.updateActivityBar(view)
 }
