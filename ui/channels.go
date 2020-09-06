@@ -102,7 +102,7 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 		cid:    cid,
 		bid:    bid,
 		buffer: make([]byte, 300),
-		msgs:   make(chan string, 10),
+		msgs:   make(chan string, 300),
 	}
 
 	go func() {
