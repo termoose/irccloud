@@ -7,7 +7,7 @@ import (
 )
 
 func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64, bid int) {
-	v.app.QueueUpdate(func() {
+	v.app.QueueUpdateDraw(func() {
 		index, c, err := v.getUserIndex(channel, oldnick, bid)
 
 		if err == nil {
@@ -21,7 +21,7 @@ func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64, bid 
 }
 
 func (v *View) AddQuitEvent(channel, nick, hostmask, reason string, time int64, bid int) {
-	v.app.QueueUpdate(func() {
+	v.app.QueueUpdateDraw(func() {
 		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
@@ -33,7 +33,7 @@ func (v *View) AddQuitEvent(channel, nick, hostmask, reason string, time int64, 
 }
 
 func (v *View) AddPartEvent(channel, nick, hostmask string, time int64, bid int) {
-	v.app.QueueUpdate(func() {
+	v.app.QueueUpdateDraw(func() {
 		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
@@ -45,7 +45,7 @@ func (v *View) AddPartEvent(channel, nick, hostmask string, time int64, bid int)
 }
 
 func (v *View) AddJoinEvent(channel, nick, hostmask string, time int64, bid int) {
-	v.app.QueueUpdate(func() {
+	v.app.QueueUpdateDraw(func() {
 		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
@@ -63,7 +63,7 @@ func getTimestamp(t int64) string {
 }
 
 func (v *View) AddBufferMsg(channel, from, msg string, time int64, bid int) {
-	v.app.QueueUpdate(func() {
+	v.app.QueueUpdateDraw(func() {
 		_, c := v.getChannel(channel, bid)
 
 		if c != nil {
