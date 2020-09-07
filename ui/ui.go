@@ -50,6 +50,11 @@ func (v *View) GetCurrentChannel() string {
 func (v *View) Start() {
 	v.app = tview.NewApplication()
 
+	v.app.SetBeforeDrawFunc(func(screen tcell.Screen) bool {
+		screen.Clear()
+		return false
+	})
+
 	v.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlSpace {
 			if v.basePages.HasPage("select_channel") {
