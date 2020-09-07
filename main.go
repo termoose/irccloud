@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/gdamore/tcell"
+	"github.com/rivo/tview"
 	"github.com/termoose/irccloud/config"
 	"github.com/termoose/irccloud/events"
 	"github.com/termoose/irccloud/requests"
@@ -9,8 +11,11 @@ import (
 )
 
 func main() {
-	conf := config.Parse()
+	// Set this so we don't overwrite the default terminal
+	// background color
+	tview.Styles.PrimitiveBackgroundColor = tcell.ColorDefault
 
+	conf := config.Parse()
 	session, err := requests.GetSessionToken(conf.Username, conf.Password)
 
 	if err != nil {
