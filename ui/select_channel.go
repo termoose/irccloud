@@ -24,8 +24,9 @@ func (v *View) inputDone(key tcell.Key, resultStrs []string, input *tview.InputF
 func (v *View) showChannelSelector() {
 	input := tview.NewInputField().
 		SetPlaceholder("Select channel").
-		SetFieldBackgroundColor(tcell.ColorGold).
-		SetFieldTextColor(tcell.ColorBlack)
+		SetFieldBackgroundColor(tcell.ColorBlack).
+		SetFieldTextColor(tcell.ColorWhite)
+		//SetFieldTextColor(tcell.ColorBlack).SetFieldTextColor(tcell.ColorBlack)
 
 	input.SetAutocompleteFunc(
 		func(currentText string) []string {

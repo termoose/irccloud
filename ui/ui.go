@@ -80,18 +80,14 @@ func (v *View) Start() {
 			channelName := v.GetCurrentChannel()
 			_, channel := v.getChannelByName(channelName)
 
-			v.app.QueueUpdateDraw(func() {
-				channel.Scroll(-10)
-			})
+			channel.Scroll(-10)
 		}
 
 		if event.Key() == tcell.KeyPgDn {
 			channelName := v.GetCurrentChannel()
 			_, channel := v.getChannelByName(channelName)
 
-			v.app.QueueUpdateDraw(func() {
-				channel.Scroll(10)
-			})
+			channel.Scroll(10)
 		}
 
 		return event
