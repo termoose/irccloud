@@ -3,6 +3,8 @@ package ui
 import (
 	"fmt"
 	"github.com/rivo/tview"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -69,14 +71,35 @@ func (v *View) AddBufferMsg(channel, from, msg string, time int64, bid int) {
 		if c != nil {
 			ts := getTimestamp(time)
 			line := fmt.Sprintf("[-:-:d]%s[-:-:-] <[-:-:b]%s[-:-:-]> %s", ts, tview.Escape(from), tview.Escape(msg))
+
+			line = tagifyCodeQuotes(line, `[grey:black:b]`, `[-:-:-]`)
 			v.writeToBuffer(line, c)
 		}
 	})
-
 }
 
 func (v *View) writeToBuffer(line string, c *channel) {
 	c.SendToChannel(line)
 	//_, _ = c.chat.Write([]byte("\n" + line))
 	//c.chat.ScrollToEnd()
+}
+
+func trimString(s string) string {
+	if len(s) < 2 {
+		return s
+	}
+
+	return s[1 : len(s)-1]
+}
+
+func tagifyCodeQuotes(input, startTag, endTag string) string {
+	regex := regexp.MustCompile("`(.*?)`")
+	found := regex.FindAllString(input, -1)
+
+	for _, f := range found {
+		tag := fmt.Sprintf("%s%s%s", startTag, trimString(f), endTag)
+		input = strings.Replace(input, f, tag, -1)
+	}
+
+	return input
 }
