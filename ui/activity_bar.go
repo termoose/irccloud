@@ -56,7 +56,7 @@ func (b *activityBar) updateActivityBar(view *View) {
 
 func bufferToBarElement(buffer activityBuffer) string {
 	if buffer.triggerWord {
-		return fmt.Sprintf("[white:blueviolet:b]%s[-:-:-] ", buffer.displayName)
+		return fmt.Sprintf("[yellow:blueviolet:b]%s[-:-:-] ", buffer.displayName)
 	}
 
 	return fmt.Sprintf("[-:blueviolet:-]%s[-:-:-] ", buffer.displayName)
@@ -121,8 +121,12 @@ func (b *activityBar) GetLatestActiveChannel() (string, error) {
 }
 
 func (b *activityBar) RegisterActivity(buffer, msg string, view *View) {
-	trigger := b.hasTriggerWord(msg)
+	// Do not register activity if it's in our current active channel
+	if view.GetCurrentChannel() == buffer {
+		return
+	}
 
+	trigger := b.hasTriggerWord(msg)
 	b.buffersLock.Lock()
 	b.buffers[buffer] = activityBuffer{
 		displayName:  buffer,
