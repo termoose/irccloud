@@ -2,7 +2,6 @@ package events
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/termoose/irccloud/requests"
 	"github.com/termoose/irccloud/ui"
 	_ "log"
@@ -75,66 +74,37 @@ func (e *eventHandler) handleBacklog(url string) {
 func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	switch curr.Type {
 	case "oob_include":
-		oobData := &oobInclude{}
-		err := json.Unmarshal(curr.Data, &oobData)
-
-		if err == nil {
-			e.handleBacklog(oobData.Url)
-		}
+		e.backlog(curr)
 
 	case "channel_init":
-		if !backlogEvent {
-			userStrings := []string{}
-			for _, userString := range curr.Members {
-				userStrings = append(userStrings, userString.Nick)
-			}
-			topic := getTopicName(curr.Topic)
-			e.Window.AddChannel(curr.Chan, topic, curr.Cid, curr.Bid, userStrings)
-		}
+		e.channels(curr, backlogEvent)
 
 	case "you_parted_channel":
-		if !backlogEvent {
-			e.Window.RemoveChannel(curr.Chan)
-		}
+		e.parted(curr, backlogEvent)
 
 	case "buffer_msg":
-		if e.Window.HasChannel(curr.Chan) {
-			e.Window.Activity.RegisterActivity(curr.Chan, curr.Msg, e.Window)
-			e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time, curr.Bid)
-		}
+		e.msg(curr)
 
 	case "joined_channel":
-		if !backlogEvent {
-			e.Window.AddUser(curr.Chan, curr.Nick, curr.Bid)
-		}
-		e.Window.AddJoinEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time, curr.Bid)
+		e.join(curr, backlogEvent)
 
 	case "parted_channel":
-		if !backlogEvent {
-			e.Window.RemoveUser(curr.Chan, curr.Nick, curr.Bid)
-		}
-		e.Window.AddPartEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Time, curr.Bid)
+		e.part(curr, backlogEvent)
 
 	case "nickchange":
-		e.Window.ChangeUserNick(curr.Chan, curr.OldNick, curr.NewNick, curr.Time, curr.Bid)
+		e.nick(curr)
 
 	case "channel_topic":
-		e.Window.ChangeTopic(curr.Chan, curr.Author, getTopicText(curr.Topic), curr.Time, curr.Bid)
+		e.topic(curr)
 
 	case "makebuffer":
-		if curr.BufferType == "conversation" {
-			header := fmt.Sprintf("Chatting since: %s", unixtimeToDate(curr.Created))
-			e.Window.AddChannel(curr.Name, header, curr.Cid, curr.Bid, []string{})
-		}
+		e.conversation(curr)
 
 	case "buffer_me_msg":
-		e.Window.AddBufferMsg(curr.Chan, curr.From, curr.Msg, curr.Time, curr.Bid)
+		e.meMsg(curr)
 
 	case "quit":
-		if !backlogEvent {
-			e.Window.RemoveUser(curr.Chan, curr.Nick, curr.Bid)
-		}
-		e.Window.AddQuitEvent(curr.Chan, curr.Nick, curr.Hostmask, curr.Msg, curr.Time, curr.Bid)
+		e.userQuit(curr, backlogEvent)
 	default:
 		//fmt.Printf("Event: %s\n", curr.Type)
 		return
