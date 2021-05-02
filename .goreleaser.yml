@@ -21,7 +21,7 @@ changelog:
 brews:
   -
     name: irccloud-cli
-    github:
+    tap:
       owner: termoose
       name: homebrew-tap
     homepage: https://github.com/termoose/irccloud
