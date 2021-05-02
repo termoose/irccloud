@@ -9,16 +9,17 @@ import (
 )
 
 type channel struct {
-	layout *tview.Grid
-	name   string
-	chat   *tview.TextView
-	users  *tview.List
-	input  *tview.InputField
-	info   *tview.TextView
-	cid    int
-	bid    int
-	msgs   chan string
-	buffer []byte
+	layout  *tview.Grid
+	name    string
+	chat    *tview.TextView
+	users   *tview.List
+	input   *tview.InputField
+	info    *tview.TextView
+	cid     int
+	bid     int
+	msgs    chan string
+	lastEid int
+	buffer  []byte
 }
 
 type channelList []channel
@@ -42,6 +43,10 @@ func (c *channel) SendToChannel(line string) {
 func (c *channel) Scroll(amount int) {
 	row, column := c.chat.GetScrollOffset()
 	c.chat.ScrollTo(row+amount, column)
+}
+
+func (c *channel) SetEid(eid int) {
+	c.lastEid = eid
 }
 
 func (v *View) getChannelByName(name string) (int, *channel) {
@@ -88,7 +93,7 @@ func (v *View) ChangeTopic(channel, author, newTopic string, time int64, bid int
 	}
 }
 
-func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
+func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) *channel {
 	newChan := channel{
 		layout: tview.NewGrid().
 			SetRows(1, 0, 1).
@@ -177,11 +182,18 @@ func (v *View) AddChannel(name, topic string, cid, bid int, userList []string) {
 
 		v.app.SetFocus(newChan.input)
 	})
+
+	return &newChan
 }
 
 func remove(s []channel, i int) []channel {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
+}
+
+func (v *View) GetChannel(name string) *channel {
+	_, channel := v.getChannelByName(name)
+	return channel
 }
 
 func (v *View) RemoveChannel(name string) {

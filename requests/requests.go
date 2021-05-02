@@ -14,9 +14,13 @@ const formtokenUrl = "https://www.irccloud.com/chat/auth-formtoken"
 const sessionUrl = "https://www.irccloud.com/chat/login"
 
 type sessionReply struct {
-	Success bool
-	Session string
-	Uid     uint32
+	Success bool   `json:"success"`
+	Session string `json:"session"`
+	Uid     uint32 `json:"uid"`
+	APIHost string `json:"api_host"`
+	WSHost  string `json:"websocket_host"`
+	WSPath  string `json:"websocket_path"`
+	URL     string `json:"url"`
 }
 
 type formtokenReply struct {
@@ -25,8 +29,8 @@ type formtokenReply struct {
 	Token   string
 }
 
-func GetBacklog(token, endpoint string) *http.Response {
-	path := fmt.Sprintf("https://api.irccloud.com%s", endpoint)
+func GetBacklog(apiUrl, token, endpoint string) *http.Response {
+	path := fmt.Sprintf("%s%s", apiUrl, endpoint)
 	client := http.Client{}
 
 	req, _ := http.NewRequest("GET", path, nil)
@@ -43,7 +47,7 @@ func GetBacklog(token, endpoint string) *http.Response {
 	return resp
 }
 
-func GetSessionToken(user, pass string) (string, error) {
+func GetSessionToken(user, pass string) (sessionReply, error) {
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
@@ -51,7 +55,7 @@ func GetSessionToken(user, pass string) (string, error) {
 	formToken, err := getFormtoken(httpClient)
 
 	if err != nil {
-		return "", fmt.Errorf("error getting session token: %v", err)
+		return sessionReply{}, fmt.Errorf("error getting session token: %v", err)
 	}
 
 	form := url.Values{}
@@ -67,27 +71,27 @@ func GetSessionToken(user, pass string) (string, error) {
 
 	if err != nil {
 		log.Print(err)
-		return "", err
+		return sessionReply{}, err
 	}
 
 	defer resp.Body.Close()
 	return parseSession(resp)
 }
 
-func parseSession(response *http.Response) (string, error) {
+func parseSession(response *http.Response) (sessionReply, error) {
 	decoder := json.NewDecoder(response.Body)
 	rep := &sessionReply{}
 	err := decoder.Decode(&rep)
 
 	if err != nil {
-		return "", fmt.Errorf("error parsing auth reply: %w", err)
+		return sessionReply{}, fmt.Errorf("error parsing auth reply: %w", err)
 	}
 
 	if !rep.Success {
-		return "", fmt.Errorf("invalid login: %w", err)
+		return sessionReply{}, fmt.Errorf("invalid login: %w", err)
 	}
 
-	return rep.Session, nil
+	return *rep, nil
 }
 
 func getFormtoken(client *http.Client) (string, error) {

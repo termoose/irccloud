@@ -14,6 +14,15 @@ func (e *eventHandler) backlog(event eventData) {
 	}
 }
 
+func (e *eventHandler) Heartbeat(seen Seen) {
+	//for cid, bidToEid := range seen {
+		//fmt.Printf("%s -> ", cid)
+		//for bid, eid := range bidToEid {
+			//fmt.Printf("%s -> %d\n", bid, eid)
+		//}
+	//}
+}
+
 func (e *eventHandler) channels(event eventData, backlogEvent bool) {
 	if !backlogEvent {
 		userStrings := []string{}
@@ -21,7 +30,8 @@ func (e *eventHandler) channels(event eventData, backlogEvent bool) {
 			userStrings = append(userStrings, userString.Nick)
 		}
 		topic := getTopicName(event.Topic)
-		e.Window.AddChannel(event.Chan, topic, event.Cid, event.Bid, userStrings)
+		newChan := e.Window.AddChannel(event.Chan, topic, event.Cid, event.Bid, userStrings)
+		newChan.SetEid(event.LastEid)
 	}
 }
 
@@ -33,7 +43,7 @@ func (e *eventHandler) parted(event eventData, backlogEvent bool) {
 
 func (e *eventHandler) msg(event eventData) {
 	if e.Window.HasChannel(event.Chan) {
-		e.Window.Activity.RegisterActivity(event.Chan, event.Msg, e.Window)
+		e.Window.Activity.RegisterActivity(event.Chan, event.Msg, event.LastEid, e.Window)
 		e.Window.AddBufferMsg(event.Chan, event.From, event.Msg, event.Time, event.Bid)
 	}
 }
@@ -64,6 +74,11 @@ func (e *eventHandler) conversation(event eventData) {
 	if event.BufferType == "conversation" {
 		header := fmt.Sprintf("Chatting since: %s", unixtimeToDate(event.Created))
 		e.Window.AddChannel(event.Name, header, event.Cid, event.Bid, []string{})
+	}
+
+	channel := e.Window.GetChannel(event.Name)
+	if channel != nil {
+		channel.SetEid(event.LastEid)
 	}
 }
 

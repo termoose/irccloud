@@ -11,13 +11,15 @@ import (
 type eventHandler struct {
 	Queue        chan eventData
 	SessionToken string
+	APIUrl       string
 	Window       *ui.View
 }
 
-func NewHandler(token string, w *ui.View) *eventHandler {
+func NewHandler(APIUrl, token string, w *ui.View) *eventHandler {
 	handler := &eventHandler{
 		Queue:        make(chan eventData, 8),
 		SessionToken: token,
+		APIUrl:       APIUrl,
 		Window:       w,
 	}
 
@@ -44,13 +46,13 @@ func (e *eventHandler) Enqueue(msg []byte) {
 }
 
 func (e *eventHandler) handleBacklog(url string) {
-	backlogResponse := requests.GetBacklog(e.SessionToken, url)
+	backlogResponse := requests.GetBacklog(e.APIUrl, e.SessionToken, url)
 	backlogData := parseBacklog(backlogResponse)
 
 	// First we initialize all channels
 	for _, event := range backlogData {
 		if event.Type == "channel_init" {
-			userStr := []string{}
+			var userStr []string
 			for _, userString := range event.Members {
 				userStr = append(userStr, userString.Nick)
 			}
@@ -75,6 +77,9 @@ func (e *eventHandler) handle(curr eventData, backlogEvent bool) {
 	switch curr.Type {
 	case "oob_include":
 		e.backlog(curr)
+
+	case "heartbeat_echo":
+		e.Heartbeat(curr.SeenEids)
 
 	case "channel_init":
 		e.channels(curr, backlogEvent)

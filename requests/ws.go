@@ -20,13 +20,19 @@ type sayMessage struct {
 	Msg    string `json:"msg"`
 }
 
-func NewConnection(token string) *Connection {
-	address := url.URL{Scheme: "wss", Host: "api.irccloud.com", Path: "/"}
+type heartbeatMessage struct {
+	Method         string `json:"_method"`
+	SelectedBuffer int    `json:"selectedBuffer"`
+	SeenEids       string `json:"seenEids"`
+}
+
+func NewConnection(data sessionReply) *Connection {
+	address := url.URL{Scheme: "wss", Host: data.WSHost, Path: data.WSPath}
 
 	headers := http.Header{}
 	headers.Add("User-Agent", "irccloud-cli")
 	headers.Add("Origin", "https://api.irccloud.com")
-	headers.Add("Cookie", fmt.Sprintf("session=%s", token))
+	headers.Add("Cookie", fmt.Sprintf("session=%s", data.Session))
 
 	conn, _, err := websocket.DefaultDialer.Dial(address.String(), headers)
 
@@ -39,6 +45,17 @@ func NewConnection(token string) *Connection {
 	}
 }
 
+func (c *Connection) SendHeartbeat(selected, cid, bid, eid int) {
+	msg := &heartbeatMessage{
+		Method: "heartbeat",
+		SelectedBuffer: selected,
+		SeenEids: makeSeenEids(cid, bid, eid),
+	}
+
+	data, _ := json.Marshal(msg)
+	_ = c.writeMessage(data)
+}
+
 func (c *Connection) SendMessage(cid int, channel, message string) {
 	msg := &sayMessage{
 		Method: "say",
@@ -48,8 +65,7 @@ func (c *Connection) SendMessage(cid int, channel, message string) {
 	}
 
 	data, _ := json.Marshal(msg)
-
-	_ = c.writeMessage([]byte(data))
+	_ = c.writeMessage(data)
 }
 
 func (c *Connection) writeMessage(message []byte) error {
@@ -60,4 +76,9 @@ func (c *Connection) ReadMessage() ([]byte, error) {
 	_, msg, err := c.WSConn.ReadMessage()
 
 	return msg, err
+}
+
+// "{\\"3\":{\\"4\\":1343825583263721}}"
+func makeSeenEids(cid, bid, eid int) string {
+	return fmt.Sprintf(`{"%d":{"%d":%d}}`, cid, bid, eid)
 }

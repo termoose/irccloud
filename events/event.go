@@ -24,6 +24,11 @@ type oobInclude struct {
 	Url string
 }
 
+// {"84415":{"4440297":1605131885388611}}}
+type BidToEid map[string]int
+// cid -> bid -> eid
+type Seen map[string]BidToEid
+
 type eventData struct {
 	Type       string
 	Time       int64           `json:"eid"`
@@ -43,6 +48,8 @@ type eventData struct {
 	Name       string          `json:"name"`
 	Archived   bool            `json:"archived"`
 	Created    int64           `json:"created"`
+	LastEid    int             `json:"last_seen_eid"`
+	SeenEids   Seen            `json:"seenEids"`
 	Data       []byte
 }
 

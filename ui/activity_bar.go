@@ -120,7 +120,12 @@ func (b *activityBar) GetLatestActiveChannel() (string, error) {
 	return b.sorted[0].displayName, nil
 }
 
-func (b *activityBar) RegisterActivity(buffer, msg string, view *View) {
+func (b *activityBar) RegisterActivity(buffer, msg string, eid int, view *View) {
+	channel := view.GetChannel(buffer)
+	if channel != nil {
+		channel.SetEid(eid)
+	}
+
 	// Do not register activity if it's in our current active channel
 	if view.GetCurrentChannel() == buffer {
 		return

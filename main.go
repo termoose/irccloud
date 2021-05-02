@@ -16,14 +16,14 @@ func main() {
 	tview.Styles.PrimitiveBackgroundColor = tcell.ColorDefault
 
 	conf := config.Parse()
-	session, err := requests.GetSessionToken(conf.Username, conf.Password)
+	sessionData, err := requests.GetSessionToken(conf.Username, conf.Password)
 
 	if err != nil {
 		log.Print(err)
 		return
 	}
 
-	wsConn := requests.NewConnection(session)
+	wsConn := requests.NewConnection(sessionData)
 	view := ui.NewView(wsConn, conf.Triggers, conf.LastChan)
 
 	defer func() {
@@ -32,7 +32,8 @@ func main() {
 		view.Stop()
 	}()
 
-	eventHandler := events.NewHandler(session, view)
+	eventHandler := events.NewHandler(sessionData.APIHost,
+		sessionData.Session, view)
 
 	go func() {
 		for {
