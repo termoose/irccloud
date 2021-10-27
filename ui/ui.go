@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"github.com/termoose/irccloud/config"
 	"github.com/termoose/irccloud/requests"
 	"sync"
 )
@@ -14,6 +15,7 @@ type View struct {
 	app         *tview.Application
 	channels    channelList
 	websocket   *requests.Connection
+	config      *config.Data
 	Activity    *activityBar
 	lastChan    string
 	channelLock sync.Mutex
@@ -29,14 +31,15 @@ func floatingModal(p tview.Primitive, width, height int) tview.Primitive {
 		AddItem(nil, 0, 1, false)
 }
 
-func NewView(socket *requests.Connection, triggerWords []string, lastChannel string) *View {
+func NewView(socket *requests.Connection, c *config.Data) *View {
 	view := &View{
 		pages:     tview.NewPages(),
 		layout:    newGrid(),
 		basePages: tview.NewPages(),
 		websocket: socket,
-		Activity:  NewActivityBar(triggerWords),
-		lastChan:  lastChannel,
+		config:    c,
+		Activity:  NewActivityBar(c.Triggers),
+		lastChan:  c.LastChan,
 	}
 
 	return view

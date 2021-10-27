@@ -19,12 +19,12 @@ func main() {
 	sessionData, err := requests.GetSessionToken(conf.Username, conf.Password)
 
 	if err != nil {
-		log.Print(err)
+		log.Println(err)
 		return
 	}
 
 	wsConn := requests.NewConnection(sessionData)
-	view := ui.NewView(wsConn, conf.Triggers, conf.LastChan)
+	view := ui.NewView(wsConn, &conf)
 
 	defer func() {
 		current := view.GetCurrentChannel()

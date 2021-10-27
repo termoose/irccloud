@@ -10,10 +10,11 @@ import (
 )
 
 type Data struct {
-	Username string   `yaml:"username"`
-	Password string   `yaml:"password"`
-	Triggers []string `yaml:"triggers"`
-	LastChan string   `yaml:"last_chan"`
+	Username     string   `yaml:"username"`
+	Password     string   `yaml:"password"`
+	Triggers     []string `yaml:"triggers"`
+	LastChan     string   `yaml:"last_chan"`
+	OnlyMessages bool     `yaml:"only_messages"`
 }
 
 func Parse() Data {
@@ -63,6 +64,7 @@ func writeDummyConfig(filename string) Data {
 		Password: "secret_password_here",
 		Triggers: []string{},
 		LastChan: "",
+		OnlyMessages: false,
 	}
 
 	writeConfig(filename, dummy)

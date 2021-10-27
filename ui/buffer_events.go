@@ -23,6 +23,10 @@ func (v *View) ChangeUserNick(channel, oldnick, newnick string, time int64, bid 
 }
 
 func (v *View) AddQuitEvent(channel, nick, hostmask, reason string, time int64, bid int) {
+	if v.config.OnlyMessages {
+		return
+	}
+
 	v.app.QueueUpdateDraw(func() {
 		_, c := v.getChannel(channel, bid)
 
@@ -35,6 +39,10 @@ func (v *View) AddQuitEvent(channel, nick, hostmask, reason string, time int64, 
 }
 
 func (v *View) AddPartEvent(channel, nick, hostmask string, time int64, bid int) {
+	if v.config.OnlyMessages {
+		return
+	}
+
 	v.app.QueueUpdateDraw(func() {
 		_, c := v.getChannel(channel, bid)
 
@@ -47,6 +55,10 @@ func (v *View) AddPartEvent(channel, nick, hostmask string, time int64, bid int)
 }
 
 func (v *View) AddJoinEvent(channel, nick, hostmask string, time int64, bid int) {
+	if v.config.OnlyMessages {
+		return
+	}
+
 	v.app.QueueUpdateDraw(func() {
 		_, c := v.getChannel(channel, bid)
 
