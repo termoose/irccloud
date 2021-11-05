@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"github.com/termoose/irccloud/config"
@@ -11,11 +12,21 @@ import (
 )
 
 func main() {
-	// Set this so we don't overwrite the default terminal
+	configFilename := flag.String("c", "", "path to config file")
+	flag.Parse()
+
+	// Set this, so we don't overwrite the default terminal
 	// background color
 	tview.Styles.PrimitiveBackgroundColor = tcell.ColorDefault
 
-	conf := config.Parse()
+	var conf config.Data
+
+	if isFlagSet("c") {
+		conf = config.ParseCustom(*configFilename)
+	} else {
+		conf = config.Parse()
+	}
+
 	sessionData, err := requests.GetSessionToken(conf.Username, conf.Password)
 
 	if err != nil {
@@ -51,4 +62,15 @@ func main() {
 	}()
 
 	view.Start()
+}
+
+func isFlagSet(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+
+	return found
 }

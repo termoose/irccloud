@@ -17,9 +17,18 @@ type Data struct {
 	OnlyMessages bool     `yaml:"only_messages"`
 }
 
+func ParseCustom(filename string) Data {
+	return parseData(filename)
+}
+
 func Parse() Data {
+	filename, _ := getPaths()
+	return parseData(filename)
+}
+
+func parseData(filename string) Data {
 	var result Data
-	filename, configDir := getPaths()
+	configDir := filepath.Base(filename)
 
 	// Don't care if this fails
 	_ = os.MkdirAll(configDir, 0700)
