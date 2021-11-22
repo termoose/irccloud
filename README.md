@@ -26,6 +26,9 @@ There's also a `last_chan` field which will be the first channel you see when yo
 this is set to the channel you were viewing the last time you closed the client. This way you always get
 back to where you last left off!
 
+You can also set the `only_messages` flag to `true` if you don't want to see join/leave etc.
+messages in your chat buffers.
+
 ```yaml
 username: your_username_here/email
 password: secret_password_here
@@ -34,6 +37,7 @@ triggers:
   - cakes
   - my_own_nick
   - cat.gif
+only_messages: false
 ```
 
 ## Installing
