@@ -46,13 +46,20 @@ only_messages: false
 go get -u github.com/termoose/irccloud
 ```
 
-Make sure `$GOPATH/bin` is added to the `$PATH` variable.
+Make sure `$GOPATH/bin` is added to the `$PATH` variable. Then run:
 
 ```bash
 irccloud
 ```
 
 On the first run a config file will be generated for you in `~/.config/irccloud`, update it with your IRCCloud username and password.
+
+If you want to speficy a custom config file you can do so with `-c`:
+
+
+```bash
+irccloud -c /my/custom/config.yaml
+```
 
 ### Homebrew
 
