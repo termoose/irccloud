@@ -54,7 +54,7 @@ irccloud
 
 On the first run a config file will be generated for you in `~/.config/irccloud`, update it with your IRCCloud username and password.
 
-If you want to speficy a custom config file you can do so with `-c`:
+If you want to specify a custom config file you can do so with `-c`:
 
 
 ```bash
@@ -74,12 +74,12 @@ Probably soon
 ## TODO
 - ~Get text input working, return = send text to channel~
 - ~Make sure channel join opens a new buffer~
-- ~Properly quit on Control+C so it doesn't mess up the terminal~
+- ~Properly quit on Control+C, so it doesn't mess up the terminal~
 - ~New query window opened for new private messages~
-- ~Show latest active channels, sorted list of oldest to newest activity~
+- ~Show the latest active channels, sorted list of oldest to newest activity~
 - Don't quit when we lose websocket connection, display "Reconnecting" dialogue and retry until Ctrl+C
 - Create a loading bar based on `numbuffers` in `oob_include`
-- Make auto-completion on nick names in the current channel buffer
+- Make auto-completion on nicknames in the current channel buffer
 - Add list of trigger names to config, include own nick by default?
 - Special highlight for channels with trigger events in event bar
 - ~Show timestamps on chat messages~
